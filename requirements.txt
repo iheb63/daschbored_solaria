@@ -9,3 +9,4 @@ streamlit_lottie==0.0.3
 mysql-connector-python
 requests
 Image
+PIL
