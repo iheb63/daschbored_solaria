@@ -22,7 +22,7 @@ st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 100px; text-align: 
 
 
 st.sidebar.success("select a page    :arrow_up:")
-)
+
 #____________music-app___________________
 
 audio_file = open('music.mp3', 'rb')
