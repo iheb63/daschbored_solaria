@@ -43,7 +43,7 @@ note_la = np.sin(frequency_la * t * 2 * np.pi)
 #-----------------------------------------data from my sql---------------------------------------------------------------------------
 #data-control revenues
 # data CR
-cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
+cnx = mysql.connector.connect(user='root', host='localhost', port=3306, database='solaria')
 query = "SELECT * FROM Data_CR"
 df0 = pd.read_sql(query, con=cnx)
 cnx.close()
