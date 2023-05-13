@@ -20,7 +20,7 @@ st.set_page_config(
 
 st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 100px; text-align: center;'>-🌞solaria KPI-</h1>", unsafe_allow_html=True)
 
-logo =  Image.open("C:/Users/ihebt/OneDrive/Bureau/daschbored solaria/logo.png",mode="png")
+logo =  Image.open("C:/Users/ihebt/OneDrive/Bureau/daschbored solaria/logo.png",mode="RGB")
 st.sidebar.success("select a page    :arrow_up:")
 st.sidebar.image(logo)
 #____________music-app___________________
