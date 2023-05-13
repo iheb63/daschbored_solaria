@@ -41,12 +41,11 @@ st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 70px; text-align: c
 
 #-----------------------------------------data from my sql---------------------------------------------------------------------------
 
-cnx = mysql.connector.connect(user='root@localhost', host=':3306', database='solaria')
+cnx = mysql.connector.connect(user='root', host='localhost', port=3306, database='solaria')
+
 query1 = "SELECT * FROM `data_cr`"
 df_r1 = pd.read_sql(query1, con=cnx)
 
-
-cnx = mysql.connector.connect(user='root', host=':3306', database='solaria')
 query1 = "SELECT * FROM `recouvrement`"
 df_recouvrement = pd.read_sql(query1, con=cnx)
 
