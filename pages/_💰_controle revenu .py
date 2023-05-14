@@ -40,8 +40,7 @@ note_la = np.sin(frequency_la * t * 2 * np.pi)
 st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 70px; text-align: center;'>💰controle revenu</h1>", unsafe_allow_html=True)
 
 #-----------------------------------------data from my sql---------------------------------------------------------------------------
-
-cnx = mysql.connector.connect(user='root', host='localhost', port=3306, database='solaria')
+cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
 
 query1 = "SELECT * FROM `data_cr`"
 df_r1 = pd.read_sql(query1, con=cnx)
