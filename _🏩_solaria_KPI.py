@@ -16,7 +16,6 @@ st.set_page_config(
     layout="wide"
 )
 
-#https://assets10.lottiefiles.com/packages/lf20_yKGuIT.json
 
 st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 100px; text-align: center;'>-🌞solaria KPI-</h1>", unsafe_allow_html=True)
 
