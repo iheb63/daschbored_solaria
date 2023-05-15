@@ -8,6 +8,7 @@ import time
 import requests
 import streamlit as st
 from streamlit_lottie import st_lottie
+import psycopg2
 
 #page title
 st.set_page_config(
@@ -16,7 +17,7 @@ st.set_page_config(
     layout="wide"
 )
 
-logo =  Image.open("logo.png")
+logo =  Image.open("C:/Users/ihebt/OneDrive/Bureau/daschbored solaria/logo.png")
 st.sidebar.success("select a page    :arrow_up:")
 st.sidebar.image(logo)
 
@@ -39,31 +40,37 @@ note_la = np.sin(frequency_la * t * 2 * np.pi)
 
 st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 70px; text-align: center;'>💰controle revenu</h1>", unsafe_allow_html=True)
 
-#-----------------------------------------data from my sql---------------------------------------------------------------------------
-cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
+#-----------------------------------------data from my postgredata_bases---------------------------------------------------------------------------
 
-query1 = "SELECT * FROM `data_cr`"
+cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
+
+# Query 1: data_cr
+query1 = "SELECT * FROM \"data_cr\""
 df_r1 = pd.read_sql(query1, con=cnx)
 
-query1 = "SELECT * FROM `recouvrement`"
-df_recouvrement = pd.read_sql(query1, con=cnx)
+# Query 2: recouvrement
+query2 = "SELECT * FROM \"recouvrement\""
+df_recouvrement = pd.read_sql(query2, con=cnx)
 
+# Query 3: solde clients
+query3 = "SELECT * FROM \"solde clients\""
+df_solde_clients = pd.read_sql(query3, con=cnx)
 
-query2 = "SELECT * FROM `solde clients`"
-df_solde_clients = pd.read_sql(query2, con=cnx)
+# Query 4: data_caisse
+query4 = "SELECT * FROM \"data_caisse\""
+df_caisse = pd.read_sql(query4, con=cnx)
 
+# Query 5: data_bq
+query5 = "SELECT * FROM \"data_bq\""
+df_BQ = pd.read_sql(query5, con=cnx)
 
-query3 = "SELECT * FROM `data_caisse`"
-df_caisse = pd.read_sql(query3, con=cnx)
-
-
-query4 = "SELECT * FROM `data_bq`"
-df_BQ = pd.read_sql(query4, con=cnx)
-
-
-solde_compte = df_BQ["debit"]-df_BQ["credit"]
+# Perform calculations
+solde_compte = df_BQ["debit"] - df_BQ["credit"]
 df_BQ["solde compte"] = solde_compte
+
+# Close the connection
 cnx.close()
+
 #--------------------------------------------------------filtre les donnes----------------------------------------------------------
 
 st.sidebar.write("--------------------")
@@ -87,7 +94,7 @@ df_controle_revenues_filtre = df_r1[(df_r1["month_column"].isin(mois)) & (df_r1[
 
 st.sidebar.write("--------------------")
 st.sidebar.title("📆 donnes liee au comptable clients")
-df_recouvrement['Date'] = pd.to_datetime(df_recouvrement['Date'])
+df_recouvrement['Date'] = pd.to_datetime(df_recouvrement['date'])
 # Extract months and create a new column 'month_column'
 df_recouvrement['month_column'] = df_recouvrement['Date'].dt.month
 df_recouvrement['years_column'] = df_recouvrement['Date'].dt.year
@@ -208,10 +215,8 @@ with left_column:
     st.write(fig2)
 
 
-fig4 = px.pie(df_recouvrement_filtre, values='Montant', names='Statut', 
-        hole=.6,width=550, title='🌟facteur en retared vs autre')
+fig4 = px.pie(df_recouvrement_filtre, values='montant', names ='statut',  hole=.6,width=550, title='🌟facteur en retared vs autre')
 fig4.update_traces(textposition='inside', textinfo='percent+label')
-
 
 
 
