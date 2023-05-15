@@ -8,5 +8,5 @@ streamlit
 streamlit_lottie
 mysql-connector-python
 Image
-
+psycopg2
 
