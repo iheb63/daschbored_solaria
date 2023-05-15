@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd 
 import plotly.express as px
+import PIL
 from PIL import Image
 import numpy as np 
 import mysql.connector
@@ -8,6 +9,8 @@ import time
 import requests
 import streamlit as st
 from streamlit_lottie import st_lottie
+
+import psycopg2
 
 
 st.set_page_config(
@@ -17,11 +20,12 @@ st.set_page_config(
 )
 
 
+
 st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 100px; text-align: center;'>-🌞solaria KPI-</h1>", unsafe_allow_html=True)
 
-logo = Image.open("logo.png")
-
+logo =  Image.open("logo.png")
 st.sidebar.success("select a page    :arrow_up:")
+
 st.sidebar.image(logo)
 #____________music-app___________________
 
@@ -42,35 +46,83 @@ note_la = np.sin(frequency_la * t * 2 * np.pi)
 #-----------------------------------------data from my sql---------------------------------------------------------------------------
 #data-control revenues
 # data CR
-cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
+#cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
+#query = "SELECT * FROM Data_CR"
+#df0 = pd.read_sql(query, con=cnx)
+#cnx.close()
+
+# data CR postgre
+# Establish a connection to PostgreSQL
+cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
+cursor = cnx.cursor()
 query = "SELECT * FROM Data_CR"
-df0 = pd.read_sql(query, con=cnx)
+cursor.execute(query)
+rows = cursor.fetchall()
+df0 = pd.DataFrame(rows, columns=[desc[0] for desc in cursor.description])
+cursor.close()
 cnx.close()
+
 
 # data prevision revenue
-cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
+#cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
+#query_p_r = "SELECT * FROM prevision_revenue"
+#df0_revznue_prev = pd.read_sql(query_p_r, con=cnx)
+#cnx.close()
+
+cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
+cursor = cnx.cursor()
 query_p_r = "SELECT * FROM prevision_revenue"
-df0_revznue_prev = pd.read_sql(query_p_r, con=cnx)
+cursor.execute(query_p_r)
+rows = cursor.fetchall()
+df0_revznue_prev = pd.DataFrame(rows, columns=[desc[0] for desc in cursor.description])
+cursor.close()
 cnx.close()
 
+
 # data GRH
-cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
-query_personnel = "SELECT * FROM `charge personnel`"
-df_personnel = pd.read_sql(query_personnel, con=cnx)
+#cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
+#query_personnel = "SELECT * FROM `charge personnel`"
+#df_personnel = pd.read_sql(query_personnel, con=cnx)
+#cnx.close()
+
+cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
+cursor = cnx.cursor()
+query_personnel = "SELECT * FROM \"charge personnel\""
+cursor.execute(query_personnel)
+rows = cursor.fetchall()
+df_personnel = pd.DataFrame(rows, columns=[desc[0] for desc in cursor.description])
+cursor.close()
 cnx.close()
 
 # data control couts
-cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
-query_couts_s = "SELECT * FROM `controle achats sortie`"
-df_couts_s = pd.read_sql(query_couts_s, con=cnx)
+#cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
+#query_couts_s = "SELECT * FROM `controle achats sortie`"
+#df_couts_s = pd.read_sql(query_couts_s, con=cnx)
+#cnx.close()
+
+cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
+cursor = cnx.cursor()
+query_couts_s = "SELECT * FROM \"controle achats sortie\""
+cursor.execute(query_couts_s)
+rows = cursor.fetchall()
+df_couts_s = pd.DataFrame(rows, columns=[desc[0] for desc in cursor.description])
+cursor.close()
 cnx.close()
 
 # data revenue restauration 
-cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
-query_r_restauration = "SELECT * FROM `data revenue restauration`"
-df_r_restauration = pd.read_sql(query_r_restauration, con=cnx)
-cnx.close()
+#cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
+#query_r_restauration = "SELECT * FROM `data revenue restauration`"
+#df_r_restauration = pd.read_sql(query_r_restauration, con=cnx)
+#cnx.close()
 
+cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
+cursor = cnx.cursor()
+query_r_restauration = "SELECT * FROM \"data revenue restauration\""
+cursor.execute(query_r_restauration)
+rows = cursor.fetchall()
+df_r_restauration = pd.DataFrame(rows, columns=[desc[0] for desc in cursor.description])
+cursor.close()
+cnx.close()
 
 #--------------------------------------------------------filtre les donnes----------------------------------------------------------
 
@@ -86,11 +138,14 @@ df0['years_column'] = df0['Date arrives'].dt.year
 years = st.sidebar.multiselect(
     "Select Year(s) for KPI",
     options=df0["years_column"].unique(),  # Update column name here
-    default=df0["years_column"].unique())  # Update column name here
+    default=df0["years_column"].unique(),  # Update column name here
+    key="years_r")  # Add a unique key argument
+
 mois = st.sidebar.multiselect(
     "Select Month(s) for KPI",
     options=df0["month_column"].unique(),
-    default=df0["month_column"].unique())
+    default=df0["month_column"].unique(),
+    key="mois_r")
 
 # Apply filters to the DataFrame
 df = df0[(df0["month_column"].isin(mois)) & (df0["years_column"].isin(years))]  # Update column name here
@@ -126,11 +181,13 @@ st.sidebar.title("📆les KPI l'activite hebergement")
 years_GRH = st.sidebar.multiselect(
     "Select Year(s) pour les donnes liee a la GRH",
     options=df_personnel["Année"].unique(),  # Update column name here
-    default=df_personnel["Année"].unique())  
+    default=df_personnel["Année"].unique(),
+    key="years_GRH")  
 mois_GRH = st.sidebar.multiselect(
     "Select Year(s) pour les donnes liee a la GRH",
     options=df_personnel["Mois"].unique(),  # Update column name here
-    default=df_personnel["Mois"].unique())  
+    default=df_personnel["Mois"].unique(),
+    key="mois_GRH")  
 
 df_personnel_filtre = df_personnel[(df_personnel["Mois"].isin(mois_GRH)) & (df_personnel["Année"].isin(years_GRH))]  # Update column name here
 
@@ -198,7 +255,7 @@ un mois...
 with left_column:
     st.write(fig11)
     with st.expander("🔑explexation"):
-       st.write("""
+         st.write("""
 Intérêt :       
 Il permet de mesurer l’effet de la variation combinée de l’occupation des
 chambres et du prix moyen par chambre louée, réalisant ainsi une synthèse de la
