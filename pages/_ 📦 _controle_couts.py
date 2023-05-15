@@ -10,7 +10,7 @@ from datetime import datetime, date
 import mysql.connector
 import time
 import requests
-
+import psycopg2
 
 
 
@@ -22,7 +22,7 @@ st.set_page_config(
 )
 
 
-logo =  Image.open("logo.png")
+logo =  Image.open("C:/Users/ihebt/OneDrive/Bureau/daschbored solaria/logo.png")
 st.sidebar.success("select a page    :arrow_up:")
 
 st.sidebar.image(logo)
@@ -42,28 +42,33 @@ t = np.linspace(0, seconds, seconds * sample_rate, False)
 note_la = np.sin(frequency_la * t * 2 * np.pi)
 
 
-#-----------------------------------------data from my sql---------------------------------------------------------------------------
-cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
+#-----------------------------------------data from my postgredatabase---------------------------------------------------------------------------
 
-query1 = "SELECT * FROM `data controle achats`"
+cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
+
+# Query 1: data controle achats
+query1 = "SELECT * FROM \"data controle achats\""
 df_controle_achats = pd.read_sql(query1, con=cnx)
 
-
-query2 = "SELECT * FROM `budget achats`"
+# Query 2: budget achats
+query2 = "SELECT * FROM \"budget achats\""
 df_controle_achats_budget = pd.read_sql(query2, con=cnx)
 
-
-query3 = "SELECT * FROM `data compt fres`"
+# Query 3: data compt fres
+query3 = "SELECT * FROM \"data compt fres\""
 df_compt_fres = pd.read_sql(query3, con=cnx)
 
-
-query4 = "SELECT * FROM `charge personnel`"
+# Query 4: charge personnel
+query4 = "SELECT * FROM \"charge personnel\""
 df_charge_personnel = pd.read_sql(query4, con=cnx)
 
-
-query5 = "SELECT * FROM `budget charge personnel`"
+# Query 5: budget charge personnel
+query5 = "SELECT * FROM \"budget charge personnel\""
 df_budget_charge_personnel = pd.read_sql(query5, con=cnx)
+
 cnx.close()
+
+
 
 
 #--------------------------------------------------------filtre les donnes----------------------------------------------------------
