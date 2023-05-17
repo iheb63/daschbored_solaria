@@ -124,7 +124,6 @@ mois_df_charge_personnel = st.sidebar.multiselect(
 # Apply filters to the DataFrame
 df_charge_personnel_filtres = df_charge_personnel[(df_charge_personnel["Mois"].isin(mois_df_charge_personnel)) & (df_charge_personnel["Année"].isin(yeras_df_charge_personnel))]  # Update column name here
 
-
 st.sidebar.write("--------------------")
 st.sidebar.title("📆 donnes liee au budget de charge personnel")
 mois_df_budget_charge_personnel = st.sidebar.multiselect(
@@ -134,8 +133,7 @@ mois_df_budget_charge_personnel = st.sidebar.multiselect(
     key = "mois_df_budget_charge_personnel")  # Update column name here
 
 # Apply filters to the DataFrame
-df_budget_charge_personnel_filtre = df_budget_charge_personnel[(df_budget_charge_personnel["Mois"].isin(mois_controle_achats_budget))]
-
+df_budget_charge_personnel_filtre = df_budget_charge_personnel[(df_budget_charge_personnel["Mois"].isin(mois_df_budget_charge_personnel))]
 
 
 st.sidebar.write("--------------------")
