@@ -17,7 +17,7 @@ st.set_page_config(
     layout="wide"
 )
 
-logo =  Image.open("logo.png")
+logo =  Image.open("C:/Users/ihebt/OneDrive/Bureau/daschbored solaria/logo.png")
 st.sidebar.success("select a page    :arrow_up:")
 st.sidebar.image(logo)
 
@@ -45,7 +45,7 @@ st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 70px; text-align: c
 cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
 
 # Query 1: data_cr
-query1 = "SELECT * FROM \"data_cr\""
+query1 = "SELECT * FROM \"controle revenu\""
 df_r1 = pd.read_sql(query1, con=cnx)
 
 # Query 2: recouvrement
@@ -143,13 +143,13 @@ st.write("---------")
 fig0 = px.area(df_controle_revenues_filtre, y = ["Revenue Hébergement","Autres revenues","Revenue restaurations"],x="Date arrives",width=600,title="🌟CA total")
 
 
-df_maps=df_controle_revenues_filtre.groupby('Pays', as_index=False)['nombre de voyageurs'].sum()
+df_maps=df_controle_revenues_filtre.groupby('pays', as_index=False)['nombre de voyageurs'].sum()
 
-fig_maps = px.choropleth(df_maps, locations='Pays', locationmode='country names',
+fig_maps = px.choropleth(df_maps, locations='pays', locationmode='country names',
                     color="nombre de voyageurs", scope='world',
                     color_continuous_scale=[(0, "lightblue"), (0.5, "blue"), (1, "darkblue")],
-                    hover_data=['Pays', 'nombre de voyageurs'],
-                    title='🌟Hotel Customers by Country')
+                    hover_data=['pays', 'nombre de voyageurs'],
+                    title='🌟Clients hôteliers par pays')
 
 
 
@@ -165,7 +165,7 @@ fig_manier_reservation = px.pie(df_controle_revenues_filtre, values='CA totale',
 #fig_CA_marche_tourestique= px.pie(df_controle_revenues_filtre, values='CA totale', names='marche tourestique', 
         #hole=.6,width=400 ,title='🌟CA totale par marche tourestique')
 
-fig_Revenue_Hébergement_type_chambre= px.pie(df_controle_revenues_filtre, values='Revenue Hébergement', names="type chambre" ,
+fig_Revenue_Hébergement_type_chambre= px.pie(df_controle_revenues_filtre, values='Revenue Hébergement', names="type Chambre" ,
         hole=.6,width=400 ,title='🌟Revenue Hébergement par type chambre')
 
 fig_taux__Facture_rectifiée = px.pie(df_controle_revenues_filtre, values='CA totale', names='Facture rectifiée', 
@@ -284,4 +284,7 @@ col1, col2, col3 = st.columns(3)
 col1.metric(label='💶Trésorerie', value= treso, delta=delta, delta_color="normal")
 col2.metric("🏦banque",solde_BQ, delta=delta_BQ, delta_color="normal")
 col3.metric("🧾caisse",solde_caisse, delta=delta_caisse, delta_color="normal" )
+
+
+
 
