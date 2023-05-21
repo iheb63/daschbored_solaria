@@ -55,7 +55,7 @@ note_la = np.sin(frequency_la * t * 2 * np.pi)
 # Establish a connection to PostgreSQL
 cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
 cursor = cnx.cursor()
-query = "SELECT * FROM Data_CR"
+query = "SELECT * FROM \"controle revenu\""
 cursor.execute(query)
 rows = cursor.fetchall()
 df0 = pd.DataFrame(rows, columns=[desc[0] for desc in cursor.description])
@@ -223,7 +223,7 @@ st.markdown("<h1 style=' font-size: 40px;color:rgb(255,69,0);'>🛌 l'activite h
 
 # Calcul du taux d'occupation
 
-NBch = df['Chambre réservée']
+NBch = df['nombre de chambres réservée']
 NBch_dispo = 239
 taux_docupation = (NBch/NBch_dispo)*100
 taux_docupation = round(taux_docupation, 2) # Arrondir à 2 décimales
@@ -232,7 +232,7 @@ df["taux d'ocupation"] = taux_docupation
 fig = px.area(df, x='Date arrives', y="taux d'ocupation",text="taux d'ocupation",width=600,title="🎯taux d'ocupation")
 
 #revenu_moyen_chambre
-revenu_moyen_chambre = df["CA totale"]/df["Chambre réservée"]
+revenu_moyen_chambre = df["CA totale"]/df["nombre de chambres réservée"]
 df["revenu moyen chambre"] = revenu_moyen_chambre
 fig11 = px.bar(df, y="revenu moyen chambre", x="Date arrives", title="🎯revenu moyen chambre")
 
@@ -269,7 +269,7 @@ l’hôtel.
 REVPAR = df["Revenue Hébergement"]/239
 df["REVPAR"] = REVPAR
 
-LADR = df["Revenue Hébergement"]/df["Chambre réservée"]
+LADR = df["Revenue Hébergement"]/df["nombre de chambres réservée"]
 df["L'ADR"]= LADR
 
 fig2 = px.bar(df, y=["REVPAR", "L'ADR", "CA totale"], x="Date arrives",barmode='group', title="🎯REVPAR L'ADR  CA totale")
@@ -480,7 +480,7 @@ st.markdown("<h1 style=' font-size: 40px;color:rgb(255,69,0);'>🛌 l'activite h
 st.write("------------------")
 
 nb_salaries = df_personnel_filtre["Matricule"].count()
-nombre_chambre_de_periode = df['Chambre réservée'].sum()
+nombre_chambre_de_periode = df['nombre de chambres réservée'].sum()
 rendement_employe= round(nombre_chambre_de_periode/nb_salaries,3)
 
 df_salaries_etage = df_personnel_filtre[df_personnel_filtre.Département=="Etage"]
