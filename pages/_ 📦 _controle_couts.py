@@ -22,7 +22,7 @@ st.set_page_config(
 )
 
 
-logo =  Image.open("logo.png")
+logo =  Image.open("C:/Users/ihebt/OneDrive/Bureau/daschbored solaria/logo.png")
 st.sidebar.success("select a page    :arrow_up:")
 
 st.sidebar.image(logo)
@@ -66,8 +66,13 @@ df_charge_personnel = pd.read_sql(query4, con=cnx)
 query5 = "SELECT * FROM \"budget charge personnel\""
 df_budget_charge_personnel = pd.read_sql(query5, con=cnx)
 
+cursor = cnx.cursor()
+query_couts_s = "SELECT * FROM \"controle achats sortie\""
+cursor.execute(query_couts_s)
+rows = cursor.fetchall()
+df_couts_consomation = pd.DataFrame(rows, columns=[desc[0] for desc in cursor.description])
+cursor.close()
 cnx.close()
-
 
 
 
@@ -124,6 +129,7 @@ mois_df_charge_personnel = st.sidebar.multiselect(
 # Apply filters to the DataFrame
 df_charge_personnel_filtres = df_charge_personnel[(df_charge_personnel["Mois"].isin(mois_df_charge_personnel)) & (df_charge_personnel["Année"].isin(yeras_df_charge_personnel))]  # Update column name here
 
+
 st.sidebar.write("--------------------")
 st.sidebar.title("📆 donnes liee au budget de charge personnel")
 mois_df_budget_charge_personnel = st.sidebar.multiselect(
@@ -155,7 +161,7 @@ mois = st.sidebar.multiselect(
 df_compt_fres_filtres= df_compt_fres[(df_compt_fres["month_column"].isin(mois)) & (df_compt_fres["years_column"].isin(years))]  # Update column name here
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 70px; text-align: center;'> 📦controle couts </h1>", unsafe_allow_html=True)
+st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 70px; text-align: center;'> 📦Contrôle couts </h1>", unsafe_allow_html=True)
 
 #---------------------suivie d'achats---------------------------------------------
 st.markdown(
@@ -175,9 +181,41 @@ st.markdown("<h1 class='title'>1-suivie d'achats</h1>", unsafe_allow_html=True)
 st.markdown("----------------------------------------------------------------")
 
 # Create the line plot
+
+# Effectuer le regroupement et calculer la somme des nuits par jour
+
 fig_les_achats = px.bar(df_controle_achats_filtres, x='date', y=['totale COUTS F&B', 'Cout energie', 'Produits de nettoyage', "Produits d'acceuil", 'Fourniture de bureau','achats techniques','consomation personnel'],width=600,barmode='group',title="🌟les charge d'achats par mois")
 
-fig_les_budget_achats = px.bar(df_controle_achats_budget_filtre, x='Mois', y=["budget food & beverage","budget energie","budge nettoyage","budget d'acceuil","budget fourniture de bureau","budget achats techniques","budget personnel"], barmode='group',width=600,title="🌟les charge d'achats par mois")
+fig_les_budget_achats = px.bar(df_controle_achats_budget_filtre, x='Mois', y=["budget food & beverage","budget energie","budge nettoyage","budget d'acceuil","budget fourniture de bureau","budget achats techniques","budget personnel"], barmode='group',width=600,title="🌟les budget d'achats par mois")
+
+
+#realise 
+
+
+a=df_controle_achats_filtres['totale COUTS F&B'].sum()
+b=df_controle_achats_filtres['Cout energie'].sum()
+c=df_controle_achats_filtres['Produits de nettoyage'].sum()
+d=df_controle_achats_filtres["Produits d'acceuil"].sum()
+e=df_controle_achats_filtres['Fourniture de bureau'].sum()
+f=df_controle_achats_filtres['achats techniques'].sum()
+g=df_controle_achats_filtres['consomation personnel'].sum()
+
+realise = a+b+c+d+e+f+g
+st.write(realise)
+#budget
+a_=df_controle_achats_budget_filtre['budget food & beverage'].sum()
+b_=df_controle_achats_budget_filtre['budget energie'].sum()
+c_=df_controle_achats_budget_filtre["budge nettoyage"].sum()
+d_=df_controle_achats_budget_filtre["budget d'acceuil"].sum()
+e_=df_controle_achats_budget_filtre['budget fourniture de bureau'].sum()
+f_=df_controle_achats_budget_filtre['budget achats techniques'].sum()
+g_=df_controle_achats_budget_filtre['budget personnel'].sum()
+
+budget  = a_+b_+c_+d_+e_+f_+g_
+st.write(budget)
+
+ecart_achats=budget-realise
+
 
 col1,col2=st.columns(2)
 with col1 :
@@ -185,33 +223,15 @@ with col1 :
 with col2 :
      st.write(fig_les_budget_achats)
 
-
-cols_to_sum1 = ['totale COUTS F&B', 'Cout energie', 'Produits de nettoyage', "Produits d'acceuil", 'Fourniture de bureau', 'achats techniques', 'consomation personnel']
-df_controle_achats_filtres['total_charge'] = df_controle_achats_filtres[cols_to_sum1].sum(axis=1)
-#st.write(df_controle_achats_filtres)
-
-cols_to_sum2 = ["budget food & beverage","budget energie","budge nettoyage","budget d'acceuil","budget fourniture de bureau","budget achats techniques","budget personnel"]
-df_controle_achats_budget_filtre['total_budget_charge_achats'] = df_controle_achats_budget_filtre[cols_to_sum2].sum(axis=1)
-
-#st.write(df_controle_achats_budget_filtre)
-
-
-df_merged = pd.DataFrame()
-df_merged["total_charge_achats"] = df_controle_achats_filtres["total_charge"]
-df_merged["total_budget_charge_achats"] = df_controle_achats_budget_filtre["total_budget_charge_achats"]
-df_merged["ecarts"]=df_merged["total_budget_charge_achats"]-df_merged["total_charge_achats"]
-#st.write(df_merged)
-
-ECART_achats = df_merged["ecarts"].sum()
-st.title("🌟Ecarts entre realisatiion et budget:")
-
-if (ECART_achats <= 0):
-    st.markdown(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>✅{abs(ECART_achats)}</h1>", unsafe_allow_html=True)
+if (ecart_achats <= 0):
+    st.markdown(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>✅{abs(ecart_achats)}</h1>", unsafe_allow_html=True)
 else:
-    st.markdown(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>❌{abs(ECART_achats)}</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>❌{abs(ecart_achats)}</h1>", unsafe_allow_html=True)
 
-fig_charge_important =px.line(df_controle_achats_filtres,x="date",y=["achats techniques","Boisson","Nourriture","Water","Electricity","Fuel & Gas"],title="🌟suivie les charge les plus important",width=1200)
-st.write(fig_charge_important)
+fig_consomation_important =px.line(df_couts_consomation,x="date",y=["achats techniques","Boisson","Nourriture","Water","Electricity","Fuel & Gas"],title="🌟suivie les consomation les plus important",width=1200)
+st.write(fig_consomation_important)
+#fig_charge_important =px.line(df_controle_achats_filtres,x="date",y=["achats techniques","Boisson","Nourriture","Water","Electricity","Fuel & Gas"],title="🌟suivie les charge les plus important",width=1200)
+#st.write(fig_charge_important)
 
 
 
@@ -228,7 +248,7 @@ fig = px.bar(df_charge_personnel_filtres, x="Mois", y='salaires net',
 
 #histograme budget 
 
-fig0 = px.bar(df_budget_charge_personnel_filtre, x="Mois", y='salaires net',
+fig0 = px.bar(df_budget_charge_personnel_filtre, x="Mois", y=["salaires net","Charges sociales & fiscales","Autres"],
              barmode='group',title="🌟budget charge personnel",
              height=400)
 
@@ -281,9 +301,9 @@ st.write("----------------------------------------------------------------------
 st.markdown(f"<h1 style=' color: rgb(255, 195, 0) ;'>3-Suivi règlement des fournisseurs :</h1>", unsafe_allow_html=True)
 
 
-fig5 = px.bar(df_compt_fres_filtres,x="Nom du fournisseur",y="reste du dettes",height=600,title="🌟solde par fres")
+fig5 = px.bar(df_compt_fres_filtres,x="Nom du fournisseur",y="reste du dettes",height=600,title="🌟solde par fournisseur")
 
-fig6 = px.line(df_compt_fres_filtres,x="Échéance",y="reste du dettes",height=450,title="🌟solde par date ")
+fig6 = px.area(df_compt_fres_filtres,x="Échéance",y="reste du dettes",height=450,title="🌟solde fournisseur par date ")
 
 
 left_column, right_column , = st.columns(2)
@@ -291,7 +311,7 @@ left_column.plotly_chart(fig5, use_container_width=True)
 right_column.plotly_chart(fig6, use_container_width=True)
 
 fig7 = px.pie(df_compt_fres_filtres, values='reste du dettes', names='etat de facture', 
-        hole=.6,width=550, title='🌟facteur en retared vs autre')
+        hole=.6,width=550, title='🌟facture en retared vs autre')
 fig7.update_traces(textposition='inside', textinfo='percent+label')
 
 
@@ -312,11 +332,54 @@ prochaines_P_subset.sort_values(["reste du dettes"], inplace=True , ascending=Fa
 
 left_column, right_column = st.columns(2)
 with left_column:
-        st.markdown(f"<h1 style=' color: rgb(255, 255, 255); font-size: 15px;'>🌟les 10 prochaine reglement</h1>", unsafe_allow_html=True)
+        st.markdown(f"<h1 style=' color: rgb(255, 255, 255); font-size: 15px;'>🌟les 10 prochaines reglements</h1>", unsafe_allow_html=True)
         st.write(prochaines_P_subset.head(10))
 with right_column:
     st.write(fig7)
 
 st.write("----------------------")
+
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+st.write("-------------------------------")
+
+st.write("-------------------------------")
+def load_lottieurl(url: str):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
+lottie_url_hello = "https://assets6.lottiefiles.com/packages/lf20_k86wxpgr.json"
+lottie = load_lottieurl(lottie_url_hello)
+#https://assets9.lottiefiles.com/packages/lf20_3kP2u2B3WC.json
+#https://assets9.lottiefiles.com/private_files/lf30_ghysqmiq.json
+#https://assets10.lottiefiles.com/packages/lf20_qpsnmykx.json
+# Use the URL as the key for the first widget
+
+
+
+col1,col2  = st.columns(2)
+with col1:
+    st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 20px;'>🔸realise par </h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style=' color: rgb(255, 255, 255); font-size: 20px; : ;'>iheb turki & wael barhoumi</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 20px;'>🔸encadre par </h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style=' color: rgb(255, 255, 255); font-size: 20px; : ;'>M.saloua banie</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 20px; : ;'>🔸entrprise d'aceuil </h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style=' color: rgb(255, 255, 255); font-size: 20px; : ;'>Medina Solaria And Thalasso</h1>", unsafe_allow_html=True)
+
+    
+with col2:
+    # Use a different key for the second widget
+    st_lottie(lottie, key=None,
+        speed=1,
+        reverse=False,
+        loop=True,
+        quality="low",
+        height=500,
+        width=700,
+    )
+
+
 
 
