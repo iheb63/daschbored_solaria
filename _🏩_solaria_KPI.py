@@ -9,6 +9,7 @@ import time
 import requests
 import streamlit as st
 from streamlit_lottie import st_lottie
+from datetime import date
 
 import psycopg2
 
@@ -126,12 +127,12 @@ cnx.close()
 
 #--------------------------------------------------------filtre les donnes----------------------------------------------------------
 
-
+#Date départDate départ
 # ***************filtre pour les dataframe control revenue
 st.sidebar.title("📊KPI revenues")
 st.sidebar.write("--------------------")
 st.sidebar.title("📆KPI l'activite hebergement")
-df0['Date arrives'] = pd.to_datetime(df0['Date arrives'])
+df0['Date arrives'] = pd.to_datetime(df0['Date départ'])
 # Extract months and create a new column 'month_column'
 df0['month_column'] = df0['Date arrives'].dt.month
 df0['years_column'] = df0['Date arrives'].dt.year
@@ -221,7 +222,7 @@ st.markdown("<h1 style=' color: rgb(255, 195, 0); font-size: 50px; text-align: c
 st.write("-----------------")
 st.markdown("<h1 style=' font-size: 40px;color:rgb(255,69,0);'>🛌 l'activite hebergement</h1>", unsafe_allow_html=True)
 
-# Calcul du taux d'occupation
+
 
 NBch = df['nombre de chambres réservée']
 NBch_dispo = 239
@@ -618,24 +619,21 @@ lottie = load_lottieurl(lottie_url_hello)
 
 
 
-left_column, right_column = st.columns(2)
-with left_column:
-    st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 20px;'>🔸realise par :</h1>", unsafe_allow_html=True)
+col1, col2,col3 = st.columns(3)
+with col1:
+    st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 20px;'>🔸realise par </h1>", unsafe_allow_html=True)
     st.markdown("<h1 style=' color: rgb(255, 255, 255); font-size: 20px; : ;'>iheb turki & wael barhoumi</h1>", unsafe_allow_html=True)
-    st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 20px;'>🔸encadre par :</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 20px;'>🔸encadre par </h1>", unsafe_allow_html=True)
     st.markdown("<h1 style=' color: rgb(255, 255, 255); font-size: 20px; : ;'>M.saloua banie</h1>", unsafe_allow_html=True)
     st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 20px; : ;'>🔸entrprise d'aceuil </h1>", unsafe_allow_html=True)
     st.markdown("<h1 style=' color: rgb(255, 255, 255); font-size: 20px; : ;'>Medina Solaria And Thalasso</h1>", unsafe_allow_html=True)
 
     
-with right_column:
-    # Use a different key for the second widget
-    st_lottie(lottie, key=None,
-        speed=1,
-        reverse=False,
-        loop=True,
-        quality="low",
-        height=400,
-        width=700,
+
+with col3:
+    logo_iset =  Image.open("logo_isetn.png")
+    st.image(logo_iset,
+        width=400,
     )
+
 
