@@ -17,7 +17,7 @@ st.set_page_config(
     layout="wide"
 )
 
-logo =  Image.open("logo.png")
+logo =  Image.open("C:/Users/ihebt/OneDrive/Bureau/daschbored solaria/logo.png")
 st.sidebar.success("select a page    :arrow_up:")
 st.sidebar.image(logo)
 
@@ -38,7 +38,7 @@ note_la = np.sin(frequency_la * t * 2 * np.pi)
 
 
 
-st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 70px; text-align: center;'>💰controle revenu</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 70px; text-align: center;'>💰Contrôle revenu</h1>", unsafe_allow_html=True)
 
 #-----------------------------------------data from my postgredata_bases---------------------------------------------------------------------------
 
@@ -136,7 +136,7 @@ df_solde_clients_filtre = df_solde_clients[(df_solde_clients["month_column"].isi
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 #les donnes et les representation graphigue
-st.markdown(f"<h1 style='color: rgb(255, 195, 0) ; font-size: 50px;'>1-controle des revenues:</h1>", unsafe_allow_html=True)
+st.markdown(f"<h1 style='color: rgb(255, 195, 0) ; font-size: 50px;'>1-Contrôle des revenues:</h1>", unsafe_allow_html=True)
 st.write("---------")
 
 
@@ -159,8 +159,22 @@ with right_column:
 with left_column:
     st.write(fig_maps) 
 
+
+fig_ca_par_client = px.bar(df_controle_revenues_filtre,y=["Revenue Hébergement","Autres revenues","Revenue restaurations"],x="Nom d'agence",barmode='group',width=600,title="🌟CA par client")    
+
+fig_ca_marche =px.bar(df_controle_revenues_filtre,y="marche tourestique",x="CA totale",width=600
+                      ,title="🌟CA par marche touristique")
+
+col1,col2 =st.columns(2)
+with col1 :
+    st.write(fig_ca_marche)
+with col2 :
+    st.write(fig_ca_par_client)
+
+
+
 fig_manier_reservation = px.pie(df_controle_revenues_filtre, values='CA totale', names='manier de reservation', 
-        hole=.6,width=400 ,title='🌟source de reservation')
+        hole=.6,width=300 ,title='🌟source de reservation')
 
 #fig_CA_marche_tourestique= px.pie(df_controle_revenues_filtre, values='CA totale', names='marche tourestique', 
         #hole=.6,width=400 ,title='🌟CA totale par marche tourestique')
@@ -169,7 +183,7 @@ fig_Revenue_Hébergement_type_chambre= px.pie(df_controle_revenues_filtre, value
         hole=.6,width=400 ,title='🌟Revenue Hébergement par type chambre')
 
 fig_taux__Facture_rectifiée = px.pie(df_controle_revenues_filtre, values='CA totale', names='Facture rectifiée', 
-        hole=.6,width=400 ,title='🌟taux des facture rectifiée')
+        hole=.6,width=260 ,title='🌟taux des facture rectifiée')
 
 col1,col2,col3 =st.columns(3)
 with col1:
@@ -186,8 +200,20 @@ pourcentage_restouaration_par_raport_ca = df_controle_revenues_filtre["Revenue r
 pourcentage_Autres_revenues_par_raport_ca = df_controle_revenues_filtre["Autres revenues"].sum()/df_controle_revenues_filtre["CA totale"].sum()
 
 
+# Effectuer le regroupement et calculer la somme des nuits par jour
+df_sum_nuites = df_controle_revenues_filtre.groupby("Date arrives")["Nombre nuits"].sum().reset_index()
+
+# Créer le graphique d'aire avec la somme des nuits par jour
+fig_nb_nuite = px.area(df_sum_nuites, x="Date arrives", y="Nombre nuits", width=1100,title="🌟Somme des nuits par jour")
+
+# Afficher le graphique
+st.write(fig_nb_nuite)
+
+
+
+
 st.markdown("<h1 style=' font-size: 20px;'>🌟le rapport entre les revenues et le CA total </h1>", unsafe_allow_html=True)            
-col1,col2,col3 = st.columns(3)
+col1,col2,col3,col4 = st.columns(4)
 with col1 :
     st.markdown("<h1 style=' font-size: 20px;'>📌 Hebergement (par mois)</h1>", unsafe_allow_html=True)
     st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{pourcentage_hebergement_par_raport_ca:.2%}</h1>", unsafe_allow_html=True)
@@ -196,6 +222,9 @@ with col2 :
     st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{pourcentage_restouaration_par_raport_ca:.2%}</h1>", unsafe_allow_html=True)
 with col3:
     st.markdown("<h1 style=' font-size: 20px;'>📌Autre revenues (par mois)</h1>", unsafe_allow_html=True)
+    st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{pourcentage_Autres_revenues_par_raport_ca:.2%}</h1>", unsafe_allow_html=True)
+with col4:
+    st.markdown("<h1 style=' font-size: 20px;'>📌Nombre des chambres occupé (par jours)</h1>", unsafe_allow_html=True)
     st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{pourcentage_Autres_revenues_par_raport_ca:.2%}</h1>", unsafe_allow_html=True)
 
 
@@ -285,6 +314,45 @@ col1.metric(label='💶Trésorerie', value= treso, delta=delta, delta_color="nor
 col2.metric("🏦banque",solde_BQ, delta=delta_BQ, delta_color="normal")
 col3.metric("🧾caisse",solde_caisse, delta=delta_caisse, delta_color="normal" )
 
+
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+st.write("-------------------------------")
+def load_lottieurl(url: str):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
+lottie_url_hello = "https://assets6.lottiefiles.com/packages/lf20_k86wxpgr.json"
+lottie = load_lottieurl(lottie_url_hello)
+#https://assets9.lottiefiles.com/packages/lf20_3kP2u2B3WC.json
+#https://assets9.lottiefiles.com/private_files/lf30_ghysqmiq.json
+#https://assets10.lottiefiles.com/packages/lf20_qpsnmykx.json
+# Use the URL as the key for the first widget
+
+
+
+col1,col2  = st.columns(2)
+with col1:
+    st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 20px;'>🔸realise par </h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style=' color: rgb(255, 255, 255); font-size: 20px; : ;'>iheb turki & wael barhoumi</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 20px;'>🔸encadre par </h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style=' color: rgb(255, 255, 255); font-size: 20px; : ;'>M.saloua banie</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 20px; : ;'>🔸entrprise d'aceuil </h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style=' color: rgb(255, 255, 255); font-size: 20px; : ;'>Medina Solaria And Thalasso</h1>", unsafe_allow_html=True)
+
+    
+with col2:
+    # Use a different key for the second widget
+    st_lottie(lottie, key=None,
+        speed=1,
+        reverse=False,
+        loop=True,
+        quality="low",
+        height=500,
+        width=700,
+    )
 
 
 
