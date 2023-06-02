@@ -17,7 +17,7 @@ st.set_page_config(
     layout="wide"
 )
 
-logo =  Image.open(logo.png")
+logo =  Image.open("logo.png")
 st.sidebar.success("select a page    :arrow_up:")
 st.sidebar.image(logo)
 
