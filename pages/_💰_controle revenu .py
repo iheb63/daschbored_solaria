@@ -316,7 +316,24 @@ revenue_sum = df_controle_revenues_filtre["Revenue Hébergement"] + df_controle_
 # Ajouter la colonne "revenue_sum" à df_merged
 df_merged["revenue_sum"] = revenue_sum
 df_merged["Date départ"] = df_controle_revenues_filtre["Date départ"]
-fig5= px.scatter(df_merged,x="Date départ",y= ["solde clients","revenue_sum"],width=600,title="🌟corrélation entre les ventes d'un hôtel et les comptes clients ")
+
+
+
+df_recouvrement_filtre['Date'] = pd.to_datetime(df_recouvrement_filtre['Date'])
+
+# Group the DataFrame by date and calculate the sum of the 'amount' column for each group
+grouped_df_recouvrement_filtre = df_recouvrement_filtre.groupby(df_recouvrement_filtre['Date'],).sum()
+grouped_df_recouvrement_filtre = grouped_df_recouvrement_filtre.reset_index()
+
+
+
+fig5 = px.bar(grouped_df_recouvrement_filtre, x="Date", y=["montant réglé","montant"],barmode='group',width=600, title="🌟 Corrélation entre les ventes d'un hôtel et les comptes clients")
+
+fig5.update_traces(marker=dict(opacity=0.5))  # Adjust the opacity value as per your preference (0.5 in this case)
+
+fig5.update_layout(plot_bgcolor="rgba(0,0,0,0)") 
+
+
 
 tabl_cor =df_merged[["revenue_sum","solde clients"]].corr()
 
@@ -329,6 +346,13 @@ with right_column:
 with left_column:
     st.write(fig4)
 
+
+
+
+df_caisse['Date'] = pd.to_datetime(df_caisse['Date'])
+
+# Group the DataFrame by date and calculate the sum of the 'amount' column for each group
+grouped_df = df_caisse.groupby(df_caisse['Date']).sum()
 
 
 # Créer un nouveau DataFrame pour stocker les données fusionnées
@@ -358,6 +382,7 @@ delta_BQ = df_treso['solde_bq'].diff().iloc[-1]
 
 solde_caisse = df_treso['solde_compte_caisse'].sum()
 delta_caisse = df_treso['solde_compte_caisse'].diff().iloc[-1]
+
 
 st.write ("-----------------------------------------------------")
 
@@ -408,7 +433,4 @@ with col2:
         height=500,
         width=700,
     )
-
-
-
 
