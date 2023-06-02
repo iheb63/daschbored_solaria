@@ -201,7 +201,7 @@ f=df_controle_achats_filtres['achats techniques'].sum()
 g=df_controle_achats_filtres['consomation personnel'].sum()
 
 realise = a+b+c+d+e+f+g
-st.write(realise)
+
 #budget
 a_=df_controle_achats_budget_filtre['budget food & beverage'].sum()
 b_=df_controle_achats_budget_filtre['budget energie'].sum()
@@ -212,10 +212,8 @@ f_=df_controle_achats_budget_filtre['budget achats techniques'].sum()
 g_=df_controle_achats_budget_filtre['budget personnel'].sum()
 
 budget  = a_+b_+c_+d_+e_+f_+g_
-st.write(budget)
 
 ecart_achats=budget-realise
-
 
 col1,col2=st.columns(2)
 with col1 :
@@ -230,8 +228,6 @@ else:
 
 fig_consomation_important =px.line(df_couts_consomation,x="date",y=["achats techniques","Boisson","Nourriture","Water","Electricity","Fuel & Gas"],title="🌟suivie les consomation les plus important",width=1200)
 st.write(fig_consomation_important)
-#fig_charge_important =px.line(df_controle_achats_filtres,x="date",y=["achats techniques","Boisson","Nourriture","Water","Electricity","Fuel & Gas"],title="🌟suivie les charge les plus important",width=1200)
-#st.write(fig_charge_important)
 
 
 
@@ -280,12 +276,10 @@ right_column.plotly_chart(fig4, use_container_width=True)
 HD = df_charge_personnel_filtres["jours dus"].sum()
 HT = df_charge_personnel_filtres["jours travaile"].sum()
 taux_dabsence = 1-(HT/HD)
-#st.title("Taux d'absentéisme par mois:")
-#st.markdown(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{taux_dabsence:.2%}</h1>", unsafe_allow_html=True)
+
 
 EFFECTIF =  df_charge_personnel_filtres["Matricule"].count()
-#st.title("effectif RH par mois:")
-#st.markdown(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{EFFECTIF}</h1>", unsafe_allow_html=True)
+
 
 left_column, right_column = st.columns(2)
 with left_column:
@@ -338,10 +332,7 @@ with right_column:
     st.write(fig7)
 
 
-
-
 #---------------------------------------------------------------------------------------------------------------------------------------------------------
-
 
 st.write("-------------------------------")
 def load_lottieurl(url: str):
