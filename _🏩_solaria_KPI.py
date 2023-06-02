@@ -10,8 +10,8 @@ import requests
 import streamlit as st
 from streamlit_lottie import st_lottie
 from datetime import date
-
 import psycopg2
+
 
 
 st.set_page_config(
@@ -100,6 +100,14 @@ cnx.close()
 #query_couts_s = "SELECT * FROM `controle achats sortie`"
 #df_couts_s = pd.read_sql(query_couts_s, con=cnx)
 #cnx.close()
+cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
+cursor = cnx.cursor()
+query_occupation = "SELECT * FROM \"suivie occupation chambre\""
+cursor.execute(query_occupation)
+rows = cursor.fetchall()
+df_occupation = pd.DataFrame(rows, columns=[desc[0] for desc in cursor.description])
+cursor.close()
+cnx.close()
 
 cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
 cursor = cnx.cursor()
@@ -128,7 +136,7 @@ cnx.close()
 #--------------------------------------------------------filtre les donnes----------------------------------------------------------
 
 #Date départDate départ
-# ***************filtre pour les dataframe control revenue
+# filtre pour les dataframe control revenue
 st.sidebar.title("📊KPI revenues")
 st.sidebar.write("--------------------")
 st.sidebar.title("📆KPI l'activite hebergement")
@@ -150,6 +158,8 @@ mois = st.sidebar.multiselect(
 
 # Apply filters to the DataFrame
 df = df0[(df0["month_column"].isin(mois)) & (df0["years_column"].isin(years))]  # Update column name here
+
+
 
 # ***************filtre pour les dataframe control revenue(restauration)
 
@@ -223,14 +233,20 @@ st.write("-----------------")
 st.markdown("<h1 style=' font-size: 40px;color:rgb(255,69,0);'>🛌 l'activite hebergement</h1>", unsafe_allow_html=True)
 
 
+#df_occupation['date'] = pd.to_datetime(df_couts_s['date'])
+# Extract months and create a new column 'month_column'
+#df_occupation['month_column'] = df_occupation['date'].dt.month
+#df_occupation['years_column'] = df_occupation['date'].dt.year
 
-NBch = df['nombre de chambres réservée']
+        
+df_occupation['NBch'] = df_occupation[['nombre de chambres réservée1','nombre de chambres réservée2','nombre de chambres réservée3','nombre de chambres réservée4','nombre de chambres réservée5','nombre de chambres réservée6','nombre de chambres réservée7','nombre de chambres réservée8','nombre de chambres réservée9','nombre de chambres réservée10','nombre de chambres réservée11']].sum(axis=1)
+NBch = df_occupation['NBch']
 NBch_dispo = 239
 taux_docupation = (NBch/NBch_dispo)*100
 taux_docupation = round(taux_docupation, 2) # Arrondir à 2 décimales
-df["taux d'ocupation"] = taux_docupation
+df_occupation["taux d'ocupation"] = taux_docupation
 
-fig = px.area(df, x='Date arrives', y="taux d'ocupation",text="taux d'ocupation",width=600,title="🎯taux d'ocupation")
+fig = px.area(df_occupation, x='Date', y="taux d'ocupation",text="taux d'ocupation",width=600,title="🎯taux d'ocupation")
 
 #revenu_moyen_chambre
 revenu_moyen_chambre = df["CA totale"]/df["nombre de chambres réservée"]
@@ -364,6 +380,8 @@ Intérêt:
 d’engager les actions nécessaires.
 
     """)
+
+st.write(df)
     
 st.markdown("<h1 style=' font-size: 40px;color:rgb(255,69,0);'>🍴  l'activite restauration</h1>", unsafe_allow_html=True)
 
@@ -471,7 +489,8 @@ Intérêt :
 Il permet de connaître le manque à gagner de la rsetauration et donc,
 d’engager les actions nécessaires.
        """)
-
+st.title("df_r_restauration_filtre")
+st.write(df_r_restauration_filtre)
 
 #---------------------------------------les indicateur  couts ---------------------------------------------------------------------------------
 
@@ -522,22 +541,22 @@ st.markdown("<h1 style=' font-size: 40px;color:rgb(255,69,0);'>🍴  l'activite 
 
 cout_nourriture_vendues  = df_couts_s_filtre["Nourriture"].sum()
 totale_vendue_nourriture = df_r_restauration_filtre["Nombre repas servie"].sum()
-cout_nourriture = (cout_nourriture_vendues/totale_vendue_nourriture)*100
+cout_nourriture =round((cout_nourriture_vendues/totale_vendue_nourriture)*100,3)
 
 
 cout_boisson_vendues = df_couts_s_filtre["Boisson"].sum()
 totale_vendue_boisson = df_r_restauration_filtre["ventes boissons"].sum()
-cout_boisson = (cout_boisson_vendues/totale_vendue_boisson)*100
+cout_boisson =round((cout_boisson_vendues/totale_vendue_boisson)*100,3)
 
 cout_fb = df_couts_s_filtre["totale COUTS F&B"].sum()
 Revenue_restaurations= df_r_restauration_filtre["Revenue restaurations"].sum()
-cout_matiere = (cout_fb/Revenue_restaurations)*100
+cout_matiere =round((cout_fb/Revenue_restaurations)*100,3)
 
 
 total_couvert_servie =df_r_restauration_filtre["Nombre de couvert servis"].sum()
 jour_travaille_personnel = df_personnel_filtre["jours travaile"].sum()
 heure_travaille = jour_travaille_personnel*8
-efficacite_personnel = heure_travaille/total_couvert_servie
+efficacite_personnel = round(heure_travaille/total_couvert_servie,3)
 
 
 
@@ -597,27 +616,17 @@ Total d’heures travaillées sur une période/total de couverts sur la même p�
 Intérêt :
 Il détermine le coût, en temps, de chaque couvert
     """)      
-
-
+st.title("df_personnel_filtre")
+st.write(df_personnel_filtre)
+st.title("df__couts_sortie _marchandies_filtree")
+st.write(df_couts_s_filtre)
+st.title("df_salaries_etage")
+st.write(df_salaries_etage)
 
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 st.write("-------------------------------")
-def load_lottieurl(url: str):
-    r = requests.get(url)
-    if r.status_code != 200:
-        return None
-    return r.json()
-lottie_url_hello = "https://assets6.lottiefiles.com/packages/lf20_yjrdpceb.json"
-lottie = load_lottieurl(lottie_url_hello)
-#https://assets9.lottiefiles.com/packages/lf20_3kP2u2B3WC.json
-#https://assets9.lottiefiles.com/private_files/lf30_ghysqmiq.json
-#https://assets10.lottiefiles.com/packages/lf20_qpsnmykx.json
-# Use the URL as the key for the first widget
-
-
-
 
 col1, col2,col3 = st.columns(3)
 with col1:
