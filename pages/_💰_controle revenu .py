@@ -17,7 +17,7 @@ st.set_page_config(
     layout="wide"
 )
 
-logo =  Image.open("logo.png")
+logo =  Image.open(logo.png")
 st.sidebar.success("select a page    :arrow_up:")
 st.sidebar.image(logo)
 
@@ -48,6 +48,11 @@ cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chg
 query1 = "SELECT * FROM \"controle revenu\""
 df_r1 = pd.read_sql(query1, con=cnx)
 
+
+query_p_r = "SELECT * FROM prevision_revenue"
+df_revenue_prev = pd.read_sql(query_p_r, con=cnx)
+
+
 # Query 2: recouvrement
 query2 = "SELECT * FROM \"recouvrement\""
 df_recouvrement = pd.read_sql(query2, con=cnx)
@@ -59,6 +64,10 @@ df_solde_clients = pd.read_sql(query3, con=cnx)
 # Query 4: data_caisse
 query4 = "SELECT * FROM \"data_caisse\""
 df_caisse = pd.read_sql(query4, con=cnx)
+
+# Query 4: data_occupation_chambre
+query6 = "SELECT * FROM \"suivie occupation chambre\""
+df_occupation = pd.read_sql(query6, con=cnx)
 
 # Query 5: data_bq
 query5 = "SELECT * FROM \"data_bq\""
@@ -90,6 +99,21 @@ mois = st.sidebar.multiselect(
 
 # Apply filters to the DataFrame
 df_controle_revenues_filtre = df_r1[(df_r1["month_column"].isin(mois)) & (df_r1["years_column"].isin(years))]  # Update column name here
+
+
+
+
+st.sidebar.write("--------------------")
+st.sidebar.title("📆 donnes liee au prevue revenue")
+df_revenue_prev_par_mois = st.sidebar.multiselect(
+    "choisire les mois pour les budget ",
+    options=df_revenue_prev["Mois"].unique(),  # Update column name here
+    default=df_revenue_prev["Mois"].unique(),
+    key = "mois_df_controle revenue prevue")  # Update column name here
+
+
+# Apply filters to the DataFrame
+df_revenue_prev_filtre = df_revenue_prev[(df_revenue_prev["Mois"].isin(df_revenue_prev_par_mois))]
 
 
 st.sidebar.write("--------------------")
@@ -140,24 +164,62 @@ st.markdown(f"<h1 style='color: rgb(255, 195, 0) ; font-size: 50px;'>1-Contrôle
 st.write("---------")
 
 
-fig0 = px.area(df_controle_revenues_filtre, y = ["Revenue Hébergement","Autres revenues","Revenue restaurations"],x="Date arrives",width=600,title="🌟CA total")
+fig_revenue_realise = px.bar(df_controle_revenues_filtre, y = ["Revenue Hébergement","Autres revenues","Revenue restaurations"],barmode ="group",x="Date arrives",width=600,title="🌟CA total")
+
+fig_prevu_revenue =px.bar(df_revenue_prev_filtre,y=["Revenue Hébergement"	,"Revenue restaurations",	"Autres revenues",	"CA totale"],x="Mois",barmode="group",title="🌟Revenue prevue par mois",width=600)
+
+b=df_controle_revenues_filtre['Revenue Hébergement'].sum()
+c=df_controle_revenues_filtre['Revenue restaurations'].sum()
+d=df_controle_revenues_filtre["Autres revenues"].sum()
+
+
+realise = b+c+d
+
+
+#budget
+a_=df_revenue_prev_filtre['Revenue Hébergement'].sum()
+b_=df_revenue_prev_filtre["Revenue restaurations"].sum()
+c_=df_revenue_prev_filtre["Autres revenues"].sum()
+
+prevue =a_+b_+c_
+ecart_prevue=prevue-realise
+
+col1,col2 =st.columns(2)
+
+with col1 :
+    st.write(fig_revenue_realise)
+with col2 :
+    st.write(fig_prevu_revenue)    
+
+if (ecart_prevue <= 0):
+    st.markdown(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>❌{abs(ecart_prevue)}</h1>", unsafe_allow_html=True)
+else:
+    st.markdown(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>✅{abs(ecart_prevue)}</h1>", unsafe_allow_html=True)
 
 
 df_maps=df_controle_revenues_filtre.groupby('pays', as_index=False)['nombre de voyageurs'].sum()
 
 fig_maps = px.choropleth(df_maps, locations='pays', locationmode='country names',
-                    color="nombre de voyageurs", scope='world',
+                    color="nombre de voyageurs", scope='world',width=650,
                     color_continuous_scale=[(0, "lightblue"), (0.5, "blue"), (1, "darkblue")],
                     hover_data=['pays', 'nombre de voyageurs'],
                     title='🌟Clients hôteliers par pays')
 
 
+# Effectuer le regroupement et calculer la somme des nuits par jour
+df_sum_nuites = df_controle_revenues_filtre.groupby("Date arrives")["Nombre nuits"].sum().reset_index()
 
-left_column, right_column = st.columns(2)
-with right_column:
-    st.write(fig0)
-with left_column:
-    st.write(fig_maps) 
+# Créer le graphique d'aire avec la somme des nuits par jour
+fig_nb_nuite = px.area(df_sum_nuites, x="Date arrives", y="Nombre nuits", width=600,title="🌟Somme des nuits par jour")
+
+
+col1,col2 =st.columns(2)
+with col1 :
+   st.write(fig_maps)
+with col2 :
+    st.write(fig_nb_nuite)
+
+
 
 
 fig_ca_par_client = px.bar(df_controle_revenues_filtre,y=["Revenue Hébergement","Autres revenues","Revenue restaurations"],x="Nom d'agence",barmode='group',width=600,title="🌟CA par client")    
@@ -206,14 +268,10 @@ df_sum_nuites = df_controle_revenues_filtre.groupby("Date arrives")["Nombre nuit
 # Créer le graphique d'aire avec la somme des nuits par jour
 fig_nb_nuite = px.area(df_sum_nuites, x="Date arrives", y="Nombre nuits", width=1100,title="🌟Somme des nuits par jour")
 
-# Afficher le graphique
-st.write(fig_nb_nuite)
-
-
 
 
 st.markdown("<h1 style=' font-size: 20px;'>🌟le rapport entre les revenues et le CA total </h1>", unsafe_allow_html=True)            
-col1,col2,col3,col4 = st.columns(4)
+col1,col2,col3 = st.columns(3)
 with col1 :
     st.markdown("<h1 style=' font-size: 20px;'>📌 Hebergement (par mois)</h1>", unsafe_allow_html=True)
     st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{pourcentage_hebergement_par_raport_ca:.2%}</h1>", unsafe_allow_html=True)
@@ -222,9 +280,6 @@ with col2 :
     st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{pourcentage_restouaration_par_raport_ca:.2%}</h1>", unsafe_allow_html=True)
 with col3:
     st.markdown("<h1 style=' font-size: 20px;'>📌Autre revenues (par mois)</h1>", unsafe_allow_html=True)
-    st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{pourcentage_Autres_revenues_par_raport_ca:.2%}</h1>", unsafe_allow_html=True)
-with col4:
-    st.markdown("<h1 style=' font-size: 20px;'>📌Nombre des chambres occupé (par jours)</h1>", unsafe_allow_html=True)
     st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{pourcentage_Autres_revenues_par_raport_ca:.2%}</h1>", unsafe_allow_html=True)
 
 
@@ -353,6 +408,7 @@ with col2:
         height=500,
         width=700,
     )
+
 
 
 
