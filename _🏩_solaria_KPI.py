@@ -55,14 +55,9 @@ note_la = np.sin(frequency_la * t * 2 * np.pi)
 # data CR postgre
 # Establish a connection to PostgreSQL
 cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
-cursor = cnx.cursor()
-query = "SELECT * FROM \"controle revenu\""
-cursor.execute(query)
-rows = cursor.fetchall()
-df0 = pd.DataFrame(rows, columns=[desc[0] for desc in cursor.description])
-cursor.close()
-cnx.close()
-
+# Query 1: data_cr
+query1 = "SELECT * FROM \"controle revenu\""
+df0 = pd.read_sql(query1, con=cnx)
 
 # data prevision revenue
 #cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
@@ -70,14 +65,8 @@ cnx.close()
 #df0_revznue_prev = pd.read_sql(query_p_r, con=cnx)
 #cnx.close()
 
-cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
-cursor = cnx.cursor()
 query_p_r = "SELECT * FROM prevision_revenue"
-cursor.execute(query_p_r)
-rows = cursor.fetchall()
-df0_revznue_prev = pd.DataFrame(rows, columns=[desc[0] for desc in cursor.description])
-cursor.close()
-cnx.close()
+df0_revznue_prev = pd.read_sql(query_p_r, con=cnx)
 
 
 # data GRH
@@ -86,37 +75,29 @@ cnx.close()
 #df_personnel = pd.read_sql(query_personnel, con=cnx)
 #cnx.close()
 
-cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
 cursor = cnx.cursor()
 query_personnel = "SELECT * FROM \"charge personnel\""
 cursor.execute(query_personnel)
 rows = cursor.fetchall()
 df_personnel = pd.DataFrame(rows, columns=[desc[0] for desc in cursor.description])
-cursor.close()
-cnx.close()
 
 # data control couts
 #cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
 #query_couts_s = "SELECT * FROM `controle achats sortie`"
 #df_couts_s = pd.read_sql(query_couts_s, con=cnx)
 #cnx.close()
-cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
 cursor = cnx.cursor()
 query_occupation = "SELECT * FROM \"suivie occupation chambre\""
 cursor.execute(query_occupation)
 rows = cursor.fetchall()
 df_occupation = pd.DataFrame(rows, columns=[desc[0] for desc in cursor.description])
-cursor.close()
-cnx.close()
 
-cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
+
 cursor = cnx.cursor()
 query_couts_s = "SELECT * FROM \"controle achats sortie\""
 cursor.execute(query_couts_s)
 rows = cursor.fetchall()
 df_couts_s = pd.DataFrame(rows, columns=[desc[0] for desc in cursor.description])
-cursor.close()
-cnx.close()
 
 # data revenue restauration 
 #cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
@@ -140,7 +121,7 @@ cnx.close()
 st.sidebar.title("📊KPI revenues")
 st.sidebar.write("--------------------")
 st.sidebar.title("📆KPI l'activite hebergement")
-df0['Date arrives'] = pd.to_datetime(df0['Date départ'])
+df0['Date arrives'] = pd.to_datetime(df0['Date arrives'])
 # Extract months and create a new column 'month_column'
 df0['month_column'] = df0['Date arrives'].dt.month
 df0['years_column'] = df0['Date arrives'].dt.year
@@ -233,12 +214,6 @@ st.write("-----------------")
 st.markdown("<h1 style=' font-size: 40px;color:rgb(255,69,0);'>🛌 l'activite hebergement</h1>", unsafe_allow_html=True)
 
 
-#df_occupation['date'] = pd.to_datetime(df_couts_s['date'])
-# Extract months and create a new column 'month_column'
-#df_occupation['month_column'] = df_occupation['date'].dt.month
-#df_occupation['years_column'] = df_occupation['date'].dt.year
-
-        
 df_occupation['NBch'] = df_occupation[['nombre de chambres réservée1','nombre de chambres réservée2','nombre de chambres réservée3','nombre de chambres réservée4','nombre de chambres réservée5','nombre de chambres réservée6','nombre de chambres réservée7','nombre de chambres réservée8','nombre de chambres réservée9','nombre de chambres réservée10','nombre de chambres réservée11']].sum(axis=1)
 NBch = df_occupation['NBch']
 NBch_dispo = 239
@@ -248,10 +223,14 @@ df_occupation["taux d'ocupation"] = taux_docupation
 
 fig = px.area(df_occupation, x='Date', y="taux d'ocupation",text="taux d'ocupation",width=600,title="🎯taux d'ocupation")
 
+
 #revenu_moyen_chambre
-revenu_moyen_chambre = df["CA totale"]/df["nombre de chambres réservée"]
-df["revenu moyen chambre"] = revenu_moyen_chambre
-fig11 = px.bar(df, y="revenu moyen chambre", x="Date arrives", title="🎯revenu moyen chambre")
+df_regroupe_jours = df.groupby(df["Date arrives"]).sum()
+df_regroupe_jours = df_regroupe_jours.reset_index()
+revenu_moyen_chambre = df_regroupe_jours["CA totale"]/NBch
+df_regroupe_jours["revenu moyen chambre"] = revenu_moyen_chambre
+
+fig11 = px.area(df_regroupe_jours, y="revenu moyen chambre", x="Date arrives", title="🎯revenu moyen chambre")
 
 
 left_column, right_column = st.columns(2)
@@ -283,24 +262,24 @@ l’hôtel.
 
 
 
-REVPAR = df["Revenue Hébergement"]/239
-df["REVPAR"] = REVPAR
+REVPAR = df_regroupe_jours["Revenue Hébergement"]/239
+df_regroupe_jours["REVPAR"] = REVPAR
 
-LADR = df["Revenue Hébergement"]/df["nombre de chambres réservée"]
-df["L'ADR"]= LADR
+LADR = df_regroupe_jours["Revenue Hébergement"]/NBch
+df_regroupe_jours["L'ADR"]= LADR
+st.write(df_regroupe_jours)
+x_values = df_regroupe_jours["Date arrives"]
+y_values = [df_regroupe_jours["REVPAR"], df_regroupe_jours["L'ADR"]]
+fig2 = px.bar(df_regroupe_jours, x=x_values, y=y_values, barmode='group', title="🎯REVPAR L'ADR CA totale")
 
-fig2 = px.bar(df, y=["REVPAR", "L'ADR", "CA totale"], x="Date arrives",barmode='group', title="🎯REVPAR L'ADR  CA totale")
 
-
-nb_arrives = df['nombre de voyageurs']
-nb_nuites = df['Nombre nuits']
+nb_arrives = df_regroupe_jours['nombre de voyageurs']
+nb_nuites = df_regroupe_jours['Nombre nuits']
 duree_moyenne = nb_nuites/nb_arrives
-df["duree_moyenne"]= duree_moyenne
+df_regroupe_jours["duree_moyenne"]= duree_moyenne
 
 
-fig_duree_moyenne = px.area(df, y = "duree_moyenne",x="Date arrives",width=600,title="🎯duree moyenne de se jour")
-
-
+fig_duree_moyenne = px.area(df_regroupe_jours, y = "duree_moyenne",x="Date arrives",width=600,title="🎯duree moyenne de se jour")
 
 
 left_column, right_column = st.columns(2)
@@ -381,20 +360,18 @@ d’engager les actions nécessaires.
 
     """)
 
-st.write(df)
     
 st.markdown("<h1 style=' font-size: 40px;color:rgb(255,69,0);'>🍴  l'activite restauration</h1>", unsafe_allow_html=True)
 
 st.write("---------------------")
 
-
 nombre_de_repas = df_r_restauration_filtre["Nombre repas servie"].sum()
-taux_remplissage = nombre_de_repas/(300*3*360)
+taux_remplissage = nombre_de_repas/(300*3*30)
 
 
 ca_restauration = df_r_restauration_filtre["Revenue restaurations"].sum()
 nombre_de_couvert_servis = df_r_restauration_filtre["Nombre de couvert servis"].sum()
-ticket_moyen = ca_restauration/nombre_de_couvert_servis
+ticket_moyen = round(ca_restauration/nombre_de_couvert_servis,3)
 
 
 nb_chaise = 300 
@@ -454,7 +431,7 @@ nombre de repas que le restaurant a vendu.
 
     """)
      st.markdown("<h1 style=' font-size: 30px;'>🎯le ticket moyen</h1>", unsafe_allow_html=True)
-     st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{ticket_moyen:.2%}</h1>", unsafe_allow_html=True)
+     st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{ticket_moyen}</h1>", unsafe_allow_html=True)
      with st.expander("🔑explexation"):
        st.write("""
         Formule :
@@ -489,7 +466,7 @@ Intérêt :
 Il permet de connaître le manque à gagner de la rsetauration et donc,
 d’engager les actions nécessaires.
        """)
-st.title("df_r_restauration_filtre")
+
 st.write(df_r_restauration_filtre)
 
 #---------------------------------------les indicateur  couts ---------------------------------------------------------------------------------
@@ -500,13 +477,18 @@ st.markdown("<h1 style=' font-size: 40px;color:rgb(255,69,0);'>🛌 l'activite h
 st.write("------------------")
 
 nb_salaries = df_personnel_filtre["Matricule"].count()
-nombre_chambre_de_periode = df['nombre de chambres réservée'].sum()
+
+nombre_chambre_de_periode =  df_occupation['NBch'].sum()
 rendement_employe= round(nombre_chambre_de_periode/nb_salaries,3)
 
-df_salaries_etage = df_personnel_filtre[df_personnel_filtre.Département=="Etage"]
-nb_salaries_etage = df_salaries_etage["Département"].count()
+df_salaries_etage = df_personnel_filtre[df_personnel_filtre.Département=="ETAGE"]
 
-Rendement_etage = nombre_chambre_de_periode / nb_salaries_etage
+jour_travaille_etage=df_salaries_etage["jours travaile"].sum()
+huere_travaille_etage =jour_travaille_etage*8*26
+st.write(huere_travaille_etage)
+st.write(nombre_chambre_de_periode)
+st.write(df_salaries_etage)
+Rendement_etage = round(nombre_chambre_de_periode / huere_travaille_etage,3)
 
 col1,col2 =st.columns(2)
 with col1:
@@ -540,7 +522,7 @@ tous les établissements hôteliers qui ne sous traitent pas cette activité
 st.markdown("<h1 style=' font-size: 40px;color:rgb(255,69,0);'>🍴  l'activite restauration</h1>", unsafe_allow_html=True)
 
 cout_nourriture_vendues  = df_couts_s_filtre["Nourriture"].sum()
-totale_vendue_nourriture = df_r_restauration_filtre["Nombre repas servie"].sum()
+totale_vendue_nourriture = df_r_restauration_filtre["ventes nourriture"].sum()
 cout_nourriture =round((cout_nourriture_vendues/totale_vendue_nourriture)*100,3)
 
 
@@ -554,9 +536,10 @@ cout_matiere =round((cout_fb/Revenue_restaurations)*100,3)
 
 
 total_couvert_servie =df_r_restauration_filtre["Nombre de couvert servis"].sum()
-jour_travaille_personnel = df_personnel_filtre["jours travaile"].sum()
-heure_travaille = jour_travaille_personnel*8
-efficacite_personnel = round(heure_travaille/total_couvert_servie,3)
+df_salaries_CUISINE = df_personnel_filtre[df_personnel_filtre.Département=="CUISINE"]
+NB_JOURS_salaries_CUISINE = df_salaries_CUISINE["jours travaile"].sum()
+nb_heure_travaille_salaries_CUISINE = NB_JOURS_salaries_CUISINE*8*26
+efficacite_personnel = round(nb_heure_travaille_salaries_CUISINE/total_couvert_servie,3)
 
 
 
@@ -644,5 +627,6 @@ with col3:
     st.image(logo_iset,
         width=400,
     )
+
 
 
