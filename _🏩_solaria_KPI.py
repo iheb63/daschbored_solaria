@@ -484,7 +484,7 @@ rendement_employe= round(nombre_chambre_de_periode/nb_salaries,3)
 df_salaries_etage = df_personnel_filtre[df_personnel_filtre.Département=="ETAGE"]
 
 jour_travaille_etage=df_salaries_etage["jours travaile"].sum()
-huere_travaille_etage =jour_travaille_etage*8*26
+huere_travaille_etage =jour_travaille_etage*8
 st.write(huere_travaille_etage)
 st.write(nombre_chambre_de_periode)
 st.write(df_salaries_etage)
@@ -538,7 +538,7 @@ cout_matiere =round((cout_fb/Revenue_restaurations)*100,3)
 total_couvert_servie =df_r_restauration_filtre["Nombre de couvert servis"].sum()
 df_salaries_CUISINE = df_personnel_filtre[df_personnel_filtre.Département=="CUISINE"]
 NB_JOURS_salaries_CUISINE = df_salaries_CUISINE["jours travaile"].sum()
-nb_heure_travaille_salaries_CUISINE = NB_JOURS_salaries_CUISINE*8*26
+nb_heure_travaille_salaries_CUISINE = NB_JOURS_salaries_CUISINE*8
 efficacite_personnel = round(nb_heure_travaille_salaries_CUISINE/total_couvert_servie,3)
 
 
