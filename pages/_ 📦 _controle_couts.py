@@ -190,8 +190,6 @@ fig_les_budget_achats = px.bar(df_controle_achats_budget_filtre, x='Mois', y=["b
 
 
 #realise 
-
-
 a=df_controle_achats_filtres['totale COUTS F&B'].sum()
 b=df_controle_achats_filtres['Cout energie'].sum()
 c=df_controle_achats_filtres['Produits de nettoyage'].sum()
@@ -201,6 +199,7 @@ f=df_controle_achats_filtres['achats techniques'].sum()
 g=df_controle_achats_filtres['consomation personnel'].sum()
 
 realise = a+b+c+d+e+f+g
+
 
 #budget
 a_=df_controle_achats_budget_filtre['budget food & beverage'].sum()
@@ -222,9 +221,9 @@ with col2 :
      st.write(fig_les_budget_achats)
 
 if (ecart_achats <= 0):
-    st.markdown(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>✅{abs(ecart_achats)}</h1>", unsafe_allow_html=True)
-else:
     st.markdown(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>❌{abs(ecart_achats)}</h1>", unsafe_allow_html=True)
+else:
+    st.markdown(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>✅{abs(ecart_achats)}</h1>", unsafe_allow_html=True)
 
 fig_consomation_important =px.line(df_couts_consomation,x="date",y=["achats techniques","Boisson","Nourriture","Water","Electricity","Fuel & Gas"],title="🌟suivie les consomation les plus important",width=1200)
 st.write(fig_consomation_important)
@@ -249,7 +248,7 @@ fig0 = px.bar(df_budget_charge_personnel_filtre, x="Mois", y=["salaires net","Ch
              height=400)
 
 fig3 = px.pie(df_charge_personnel_filtres, values='salaires net', names='Type de contrat', 
-        hole=.6, title='🌟type de contrat ')
+        hole=.6, title='🌟masse salariale par type de contrat ')
 fig3.update_traces(textposition='inside', textinfo='percent+label')
 
 fig4 = px.bar(df_charge_personnel_filtres, x="Sexe", y='salaires net',
@@ -262,8 +261,7 @@ right_column.plotly_chart(fig0, use_container_width=True)
 #ecatrs budget et realisation
 total__budget_salarial_personnel  = df_budget_charge_personnel_filtre['salaires net'].sum()
 ECART_RH = round(total__budget_salarial_personnel - total_charge_salarial_personnel,3)
-st.title("🌟Ecarts entre realisatiion et budget:")
-
+st.title("🌟Ecarts entre realisatiion et budget")
 if (ECART_RH >= 0):
     st.markdown(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>✅{abs(ECART_RH)}</h1>", unsafe_allow_html=True)
 else:
@@ -297,7 +295,7 @@ st.markdown(f"<h1 style=' color: rgb(255, 195, 0) ;'>3-Suivi règlement des four
 
 fig5 = px.bar(df_compt_fres_filtres,x="Nom du fournisseur",y="reste du dettes",height=600,title="🌟solde par fournisseur")
 
-fig6 = px.area(df_compt_fres_filtres,x="Échéance",y="reste du dettes",height=450,title="🌟solde fournisseur par date ")
+fig6 = px.bar(df_compt_fres_filtres,x="Échéance",y="reste du dettes",height=450,title="🌟solde fournisseur par date ")
 
 
 left_column, right_column , = st.columns(2)
@@ -330,6 +328,7 @@ with left_column:
         st.write(prochaines_P_subset.head(10))
 with right_column:
     st.write(fig7)
+
 
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -369,4 +368,5 @@ with col2:
         height=500,
         width=700,
     )
+
 
