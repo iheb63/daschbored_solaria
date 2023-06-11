@@ -4,7 +4,6 @@ import plotly.express as px
 import PIL
 from PIL import Image
 import numpy as np 
-import mysql.connector
 import time
 import requests
 import streamlit as st
@@ -45,6 +44,30 @@ note_la = np.sin(frequency_la * t * 2 * np.pi)
 
 
 #-----------------------------------------data from my sql---------------------------------------------------------------------------
+
+
+cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
+
+
+
+query2 = "SELECT * FROM \"recouvrement\""
+df_recouvrement = pd.read_sql(query2, con=cnx)
+
+# Query 3: solde clients
+query3 = "SELECT * FROM \"solde clients\""
+df_solde_clients = pd.read_sql(query3, con=cnx)
+
+# Query 4: data_caisse
+query4 = "SELECT * FROM \"data_caisse\""
+df_caisse = pd.read_sql(query4, con=cnx)
+
+
+# Query 5: data_bq
+query5 = "SELECT * FROM \"data_bq\""
+df_BQ = pd.read_sql(query5, con=cnx)
+
+cnx.close()
+
 #data-control revenues
 # data CR
 #cnx = mysql.connector.connect(user='root', host='localhost', database='solaria')
@@ -486,6 +509,7 @@ df_salaries_etage = df_personnel_filtre[df_personnel_filtre.Département=="ETAGE
 jour_travaille_etage=df_salaries_etage["jours travaile"].sum()
 huere_travaille_etage =jour_travaille_etage*8
 
+
 Rendement_etage = round(nombre_chambre_de_periode / huere_travaille_etage,3)
 
 col1,col2 =st.columns(2)
@@ -598,7 +622,6 @@ Intérêt :
 Il détermine le coût, en temps, de chaque couvert
     """)      
 
-
 #---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 st.write("-------------------------------")
@@ -619,6 +642,8 @@ with col3:
     st.image(logo_iset,
         width=400,
     )
+
+
 
 
 
