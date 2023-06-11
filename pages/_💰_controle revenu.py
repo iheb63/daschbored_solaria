@@ -3,7 +3,6 @@ import plotly.express as px  # pip install plotly-express
 import streamlit as st  # pip install streamlit
 from PIL import Image
 import numpy as np
-import mysql.connector
 import time
 import requests
 import streamlit as st
@@ -163,7 +162,7 @@ df_solde_clients_filtre = df_solde_clients[(df_solde_clients["month_column"].isi
 st.markdown(f"<h1 style='color: rgb(255, 195, 0) ; font-size: 50px;'>1-Contrôle des revenues:</h1>", unsafe_allow_html=True)
 st.write("---------")
 
-fig_revenue_realise = px.bar(df_controle_revenues_filtre, y = ["Revenue Hébergement","Autres revenues","Revenue restaurations"],barmode ="group",x="Date arrives",width=600,title="🌟CA total")
+fig_revenue_realise = px.bar(df_controle_revenues_filtre, y = ["Revenue Hébergement","Autres revenues","Revenue restaurations","CA totale"],barmode ="group",x="Date arrives",width=600,title="🌟CA total")
 
 fig_prevu_revenue =px.bar(df_revenue_prev_filtre,y=["Revenue Hébergement"	,"Revenue restaurations",	"Autres revenues",	"CA totale"],x="Mois",barmode="group",title="🌟Revenue prevue par mois",width=600)
 
@@ -171,9 +170,7 @@ b=df_controle_revenues_filtre['Revenue Hébergement'].sum()
 c=df_controle_revenues_filtre['Revenue restaurations'].sum()
 d=df_controle_revenues_filtre["Autres revenues"].sum()
 
-
 realise = b+c+d
-
 
 #budget
 a_=df_revenue_prev_filtre['Revenue Hébergement'].sum()
@@ -181,6 +178,8 @@ b_=df_revenue_prev_filtre["Revenue restaurations"].sum()
 c_=df_revenue_prev_filtre["Autres revenues"].sum()
 
 prevue =a_+b_+c_
+
+
 ecart_prevue=prevue-realise
 
 col1,col2 =st.columns(2)
@@ -191,9 +190,9 @@ with col2 :
     st.write(fig_prevu_revenue)    
 
 if (ecart_prevue <= 0):
-    st.markdown(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>❌{abs(ecart_prevue)}</h1>", unsafe_allow_html=True)
-else:
     st.markdown(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>✅{abs(ecart_prevue)}</h1>", unsafe_allow_html=True)
+else:
+    st.markdown(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>❌{abs(ecart_prevue)}</h1>", unsafe_allow_html=True)
 
 
 df_maps=df_controle_revenues_filtre.groupby('pays', as_index=False)['nombre de voyageurs'].sum()
@@ -394,7 +393,6 @@ col2.metric("🏦banque",solde_BQ, delta=delta_BQ, delta_color="normal")
 col3.metric("🧾caisse",solde_caisse, delta=delta_caisse, delta_color="normal" )
 
 
-
 #---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 st.write("-------------------------------")
@@ -430,7 +428,13 @@ with col2:
         loop=True,
         quality="low",
         height=500,
-        width=700,
-    )
+        width=700,)
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 
