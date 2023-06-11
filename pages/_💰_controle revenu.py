@@ -8,6 +8,7 @@ import requests
 import streamlit as st
 from streamlit_lottie import st_lottie
 import psycopg2
+from typing import Literal
 
 #page title
 st.set_page_config(
