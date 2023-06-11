@@ -162,7 +162,6 @@ df_solde_clients_filtre = df_solde_clients[(df_solde_clients["month_column"].isi
 #les donnes et les representation graphigue
 st.markdown(f"<h1 style='color: rgb(255, 195, 0) ; font-size: 50px;'>1-Contrôle des revenues:</h1>", unsafe_allow_html=True)
 st.write("---------")
-st.write(df_controle_revenues_filtre)
 
 fig_revenue_realise = px.bar(df_controle_revenues_filtre, y = ["Revenue Hébergement","Autres revenues","Revenue restaurations"],barmode ="group",x="Date arrives",width=600,title="🌟CA total")
 
