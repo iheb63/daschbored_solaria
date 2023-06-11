@@ -7,7 +7,6 @@ import numpy as np
 from streamlit_lottie import st_lottie
 import pandas as pd
 from datetime import datetime, date
-import mysql.connector
 import time
 import requests
 import psycopg2
