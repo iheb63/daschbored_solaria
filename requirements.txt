@@ -7,7 +7,6 @@ psycopg2
 requests
 streamlit
 streamlit_lottie == 0.0.5
-mysql-connector-python
 requests
 Image
 
