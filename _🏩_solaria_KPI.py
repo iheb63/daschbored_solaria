@@ -267,7 +267,7 @@ df_regroupe_jours["REVPAR"] = REVPAR
 
 LADR = df_regroupe_jours["Revenue Hébergement"]/NBch
 df_regroupe_jours["L'ADR"]= LADR
-st.write(df_regroupe_jours)
+
 x_values = df_regroupe_jours["Date arrives"]
 y_values = [df_regroupe_jours["REVPAR"], df_regroupe_jours["L'ADR"]]
 fig2 = px.bar(df_regroupe_jours, x=x_values, y=y_values, barmode='group', title="🎯REVPAR L'ADR CA totale")
@@ -467,7 +467,7 @@ Il permet de connaître le manque à gagner de la rsetauration et donc,
 d’engager les actions nécessaires.
        """)
 
-st.write(df_r_restauration_filtre)
+
 
 #---------------------------------------les indicateur  couts ---------------------------------------------------------------------------------
 
@@ -485,9 +485,7 @@ df_salaries_etage = df_personnel_filtre[df_personnel_filtre.Département=="ETAGE
 
 jour_travaille_etage=df_salaries_etage["jours travaile"].sum()
 huere_travaille_etage =jour_travaille_etage*8
-st.write(huere_travaille_etage)
-st.write(nombre_chambre_de_periode)
-st.write(df_salaries_etage)
+
 Rendement_etage = round(nombre_chambre_de_periode / huere_travaille_etage,3)
 
 col1,col2 =st.columns(2)
@@ -599,12 +597,6 @@ Total d’heures travaillées sur une période/total de couverts sur la même p�
 Intérêt :
 Il détermine le coût, en temps, de chaque couvert
     """)      
-st.title("df_personnel_filtre")
-st.write(df_personnel_filtre)
-st.title("df__couts_sortie _marchandies_filtree")
-st.write(df_couts_s_filtre)
-st.title("df_salaries_etage")
-st.write(df_salaries_etage)
 
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------
