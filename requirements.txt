@@ -3,10 +3,11 @@ numpy
 pandas
 Pillow
 plotly
+psycopg2
 requests
 streamlit
-
+streamlit_lottie
 mysql-connector-python
+requests
 Image
-psycopg2
 
