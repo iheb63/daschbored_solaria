@@ -4,7 +4,6 @@ import plotly.express as px
 from datetime import date
 from PIL import Image
 import numpy as np
-from streamlit_lottie import st_lottie
 import pandas as pd
 from datetime import datetime, date
 import time
@@ -331,23 +330,9 @@ with right_column:
 
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------
-
 st.write("-------------------------------")
-def load_lottieurl(url: str):
-    r = requests.get(url)
-    if r.status_code != 200:
-        return None
-    return r.json()
-lottie_url_hello = "https://assets6.lottiefiles.com/packages/lf20_k86wxpgr.json"
-lottie = load_lottieurl(lottie_url_hello)
-#https://assets9.lottiefiles.com/packages/lf20_3kP2u2B3WC.json
-#https://assets9.lottiefiles.com/private_files/lf30_ghysqmiq.json
-#https://assets10.lottiefiles.com/packages/lf20_qpsnmykx.json
-# Use the URL as the key for the first widget
 
-
-
-col1,col2  = st.columns(2)
+col1, col2,col3 = st.columns(3)
 with col1:
     st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 20px;'>🔸realise par </h1>", unsafe_allow_html=True)
     st.markdown("<h1 style=' color: rgb(255, 255, 255); font-size: 20px; : ;'>iheb turki & wael barhoumi</h1>", unsafe_allow_html=True)
@@ -357,15 +342,10 @@ with col1:
     st.markdown("<h1 style=' color: rgb(255, 255, 255); font-size: 20px; : ;'>Medina Solaria And Thalasso</h1>", unsafe_allow_html=True)
 
     
-with col2:
-    # Use a different key for the second widget
-    st_lottie(lottie, key=None,
-        speed=1,
-        reverse=False,
-        loop=True,
-        quality="low",
-        height=500,
-        width=700,
-    )
 
+with col3:
+    logo_iset =  Image.open("logo_isetn.png")
+    st.image(logo_iset,
+        width=400,
+    )
 
