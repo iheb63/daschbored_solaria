@@ -7,7 +7,7 @@ import time
 import requests
 import streamlit as st
 import psycopg2
-from typing import Literal
+
 
 #page title
 st.set_page_config(
