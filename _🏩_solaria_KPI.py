@@ -4,10 +4,11 @@ import plotly.express as px
 import PIL
 from PIL import Image
 import numpy as np 
+import mysql.connector
 import time
 import requests
 import streamlit as st
-
+from streamlit_lottie import st_lottie
 from datetime import date
 import psycopg2
 
@@ -44,29 +45,6 @@ note_la = np.sin(frequency_la * t * 2 * np.pi)
 
 
 #-----------------------------------------data from my sql---------------------------------------------------------------------------
-
-
-cnx = psycopg2.connect("postgres://iheb:3oO6ZpxwsB3iKuwe1oqO2YaHIzMI9vyt@dpg-chgh7ou7avjbbjpn4h50-a.oregon-postgres.render.com/solaria")
-
-
-
-query2 = "SELECT * FROM \"recouvrement\""
-df_recouvrement = pd.read_sql(query2, con=cnx)
-
-# Query 3: solde clients
-query3 = "SELECT * FROM \"solde clients\""
-df_solde_clients = pd.read_sql(query3, con=cnx)
-
-# Query 4: data_caisse
-query4 = "SELECT * FROM \"data_caisse\""
-df_caisse = pd.read_sql(query4, con=cnx)
-
-
-# Query 5: data_bq
-query5 = "SELECT * FROM \"data_bq\""
-df_BQ = pd.read_sql(query5, con=cnx)
-
-cnx.close()
 
 #data-control revenues
 # data CR
@@ -144,10 +122,10 @@ cnx.close()
 st.sidebar.title("📊KPI revenues")
 st.sidebar.write("--------------------")
 st.sidebar.title("📆KPI l'activite hebergement")
-df0['Date arrives'] = pd.to_datetime(df0['Date arrives'])
+df0['Date'] = pd.to_datetime(df0['Date'])
 # Extract months and create a new column 'month_column'
-df0['month_column'] = df0['Date arrives'].dt.month
-df0['years_column'] = df0['Date arrives'].dt.year
+df0['month_column'] = df0['Date'].dt.month
+df0['years_column'] = df0['Date'].dt.year
 years = st.sidebar.multiselect(
     "Select Year(s) for KPI",
     options=df0["years_column"].unique(),  # Update column name here
@@ -248,12 +226,12 @@ fig = px.area(df_occupation, x='Date', y="taux d'ocupation",text="taux d'ocupati
 
 
 #revenu_moyen_chambre
-df_regroupe_jours = df.groupby(df["Date arrives"]).sum()
+df_regroupe_jours = df.groupby(df["Date"]).sum()
 df_regroupe_jours = df_regroupe_jours.reset_index()
 revenu_moyen_chambre = df_regroupe_jours["CA totale"]/NBch
 df_regroupe_jours["revenu moyen chambre"] = revenu_moyen_chambre
 
-fig11 = px.area(df_regroupe_jours, y="revenu moyen chambre", x="Date arrives", title="🎯revenu moyen chambre")
+fig11 = px.area(df_regroupe_jours, y="revenu moyen chambre", x="Date", title="🎯revenu moyen chambre")
 
 
 left_column, right_column = st.columns(2)
@@ -291,7 +269,7 @@ df_regroupe_jours["REVPAR"] = REVPAR
 LADR = df_regroupe_jours["Revenue Hébergement"]/NBch
 df_regroupe_jours["L'ADR"]= LADR
 
-x_values = df_regroupe_jours["Date arrives"]
+x_values = df_regroupe_jours["Date"]
 y_values = [df_regroupe_jours["REVPAR"], df_regroupe_jours["L'ADR"]]
 fig2 = px.bar(df_regroupe_jours, x=x_values, y=y_values, barmode='group', title="🎯REVPAR L'ADR CA totale")
 
@@ -302,7 +280,7 @@ duree_moyenne = nb_nuites/nb_arrives
 df_regroupe_jours["duree_moyenne"]= duree_moyenne
 
 
-fig_duree_moyenne = px.area(df_regroupe_jours, y = "duree_moyenne",x="Date arrives",width=600,title="🎯duree moyenne de se jour")
+fig_duree_moyenne = px.area(df_regroupe_jours, y = "duree_moyenne",x="Date",width=600,title="🎯duree moyenne de se jour")
 
 
 left_column, right_column = st.columns(2)
@@ -642,8 +620,5 @@ with col3:
     st.image(logo_iset,
         width=400,
     )
-
-
-
 
 
