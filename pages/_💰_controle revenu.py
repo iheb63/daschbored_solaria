@@ -3,7 +3,6 @@ import plotly.express as px  # pip install plotly-express
 import streamlit as st  # pip install streamlit
 from PIL import Image
 import numpy as np
-import mysql.connector
 import time
 import requests
 import streamlit as st
