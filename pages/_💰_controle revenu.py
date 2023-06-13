@@ -3,11 +3,12 @@ import plotly.express as px  # pip install plotly-express
 import streamlit as st  # pip install streamlit
 from PIL import Image
 import numpy as np
+import mysql.connector
 import time
 import requests
 import streamlit as st
+from streamlit_lottie import st_lottie
 import psycopg2
-
 
 #page title
 st.set_page_config(
@@ -83,10 +84,10 @@ cnx.close()
 
 st.sidebar.write("--------------------")
 st.sidebar.title("📆 donnes liee au controle revenues")
-df_r1['Date arrives'] = pd.to_datetime(df_r1['Date arrives'])
+df_r1['Date'] = pd.to_datetime(df_r1['Date'])
 # Extract months and create a new column 'month_column'
-df_r1['month_column'] = df_r1['Date arrives'].dt.month
-df_r1['years_column'] = df_r1['Date arrives'].dt.year
+df_r1['month_column'] = df_r1['Date'].dt.month
+df_r1['years_column'] = df_r1['Date'].dt.year
 years = st.sidebar.multiselect(
     "Select Year(s) for KPI",
     options=df_r1["years_column"].unique(),  # Update column name here
@@ -162,7 +163,7 @@ df_solde_clients_filtre = df_solde_clients[(df_solde_clients["month_column"].isi
 st.markdown(f"<h1 style='color: rgb(255, 195, 0) ; font-size: 50px;'>1-Contrôle des revenues:</h1>", unsafe_allow_html=True)
 st.write("---------")
 
-fig_revenue_realise = px.bar(df_controle_revenues_filtre, y = ["Revenue Hébergement","Autres revenues","Revenue restaurations","CA totale"],barmode ="group",x="Date arrives",width=600,title="🌟CA total")
+fig_revenue_realise = px.bar(df_controle_revenues_filtre, y = ["Revenue Hébergement","Autres revenues","Revenue restaurations","CA totale"],barmode ="group",x="Date",width=600,title="🌟CA total")
 
 fig_prevu_revenue =px.bar(df_revenue_prev_filtre,y=["Revenue Hébergement"	,"Revenue restaurations",	"Autres revenues",	"CA totale"],x="Mois",barmode="group",title="🌟Revenue prevue par mois",width=600)
 
@@ -205,10 +206,10 @@ fig_maps = px.choropleth(df_maps, locations='pays', locationmode='country names'
 
 
 # Effectuer le regroupement et calculer la somme des nuits par jour
-df_sum_nuites = df_controle_revenues_filtre.groupby("Date arrives")["Nombre nuits"].sum().reset_index()
+df_sum_nuites = df_controle_revenues_filtre.groupby("Date")["Nombre nuits"].sum().reset_index()
 
 # Créer le graphique d'aire avec la somme des nuits par jour
-fig_nb_nuite = px.area(df_sum_nuites, x="Date arrives", y="Nombre nuits", width=600,title="🌟Somme des nuits par jour")
+fig_nb_nuite = px.area(df_sum_nuites, x="Date", y="Nombre nuits", width=600,title="🌟Somme des nuits par jour")
 
 
 col1,col2 =st.columns(2)
@@ -261,10 +262,10 @@ pourcentage_Autres_revenues_par_raport_ca = df_controle_revenues_filtre["Autres 
 
 
 # Effectuer le regroupement et calculer la somme des nuits par jour
-df_sum_nuites = df_controle_revenues_filtre.groupby("Date arrives")["Nombre nuits"].sum().reset_index()
+df_sum_nuites = df_controle_revenues_filtre.groupby("Date")["Nombre nuits"].sum().reset_index()
 
 # Créer le graphique d'aire avec la somme des nuits par jour
-fig_nb_nuite = px.area(df_sum_nuites, x="Date arrives", y="Nombre nuits", width=1100,title="🌟Somme des nuits par jour")
+fig_nb_nuite = px.area(df_sum_nuites, x="Date", y="Nombre nuits", width=1100,title="🌟Somme des nuits par jour")
 
 
 
@@ -396,8 +397,21 @@ col3.metric("🧾caisse",solde_caisse, delta=delta_caisse, delta_color="normal" 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 st.write("-------------------------------")
+def load_lottieurl(url: str):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
+lottie_url_hello = "https://assets6.lottiefiles.com/packages/lf20_k86wxpgr.json"
+lottie = load_lottieurl(lottie_url_hello)
+#https://assets9.lottiefiles.com/packages/lf20_3kP2u2B3WC.json
+#https://assets9.lottiefiles.com/private_files/lf30_ghysqmiq.json
+#https://assets10.lottiefiles.com/packages/lf20_qpsnmykx.json
+# Use the URL as the key for the first widget
 
-col1, col2,col3 = st.columns(3)
+
+
+col1,col2  = st.columns(2)
 with col1:
     st.markdown("<h1 style=' color: rgb(0, 255, 255); font-size: 20px;'>🔸realise par </h1>", unsafe_allow_html=True)
     st.markdown("<h1 style=' color: rgb(255, 255, 255); font-size: 20px; : ;'>iheb turki & wael barhoumi</h1>", unsafe_allow_html=True)
@@ -407,17 +421,18 @@ with col1:
     st.markdown("<h1 style=' color: rgb(255, 255, 255); font-size: 20px; : ;'>Medina Solaria And Thalasso</h1>", unsafe_allow_html=True)
 
     
+with col2:
+    # Use a different key for the second widget
+    st_lottie(lottie, key=None,
+        speed=1,
+        reverse=False,
+        loop=True,
+        quality="low",
+        height=500,
+        width=700,)
 
-with col3:
-    logo_iset =  Image.open("logo_isetn.png")
-    st.image(logo_iset,
-        width=400,
-    )
 #---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-
