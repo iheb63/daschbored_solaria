@@ -4,7 +4,6 @@ import plotly.express as px
 import PIL
 from PIL import Image
 import numpy as np 
-import mysql.connector
 import time
 import requests
 import streamlit as st
