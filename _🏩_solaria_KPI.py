@@ -7,6 +7,7 @@ import numpy as np
 import time
 import requests
 import streamlit as st
+from streamlit_lottie import st_lottie
 from datetime import date
 import psycopg2
 
@@ -207,7 +208,7 @@ df_couts_s_filtre = df_couts_s[(df_couts_s["month_column"].isin(mois_df_couts_s)
 
 
 #---------------------------------------les indicateur performance ---------------------------------------------------------------------------------
-st.markdown("<h1 style=' color: rgb(255, 195, 0); font-size: 50px; text-align: center;'>📊 les indicateur de performance de l'hôtel</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style=' color: rgb(255, 195, 0); font-size: 50px; text-align: center;'>📊 les indicateurs de performance de l'hôtel</h1>", unsafe_allow_html=True)
 
 st.write("-----------------")
 st.markdown("<h1 style=' font-size: 40px;color:rgb(255,69,0);'>🛌 l'activite hebergement</h1>", unsafe_allow_html=True)
@@ -237,26 +238,26 @@ with right_column:
     st.write(fig)
     with st.expander("🔑explexation"):
          st.write("""
-Intérêt :         
+formule :(NBRE DE CHAMBRES LOUEES / NBRE DE CHAMBRES DISPONIBLES )*100
+
+Intérêt :       
 Il permet de traduire le nombre de chambres louées en % par rapport à la
-capacité totale en chambres offertes. Autrement formulé, et d’une manière
+capacité totale en chambres offertes.d’une manière
 statique, c’est répondre à la question suivante : Combien avons-nous loué de
-chambres ?
-Sur le plan dynamique, le taux d’occupation nous renseigne sur la capacité
-commerciale de la brigade de réception et celle de l’équipe de la force de vente
-(L’agressivité commerciale). On peut le calculer pour une journée, une décade,
-un mois... 
+chambres ?.
     """)
 with left_column:
     st.write(fig11)
     with st.expander("🔑explexation"):
-         st.write("""
-Intérêt :       
+         st.write("""      
+formule : CHIFFRE D’AFFAIRES DE L’HOTEL / NBRE DE CHAMBRES LOUEES
+Intérêt :  
 Il permet de mesurer l’effet de la variation combinée de l’occupation des
 chambres et du prix moyen par chambre louée, réalisant ainsi une synthèse de la
 performance commerciale de l’établissement. Pour beaucoup de responsables
 hôteliers, le « Yield » est aujourd’hui le principal indicateur de performance de
-l’hôtel.
+l’hôtel.         
+
     """)
 
 
@@ -286,28 +287,31 @@ with right_column:
         st.write(fig_duree_moyenne)
         with st.expander("🔑explexation"):
          st.write("""
-Formule :
-NBRE DE NUITEES/NBRE DES ARRIVEES
+Formule : NBRE DE NUITEES/NBRE DES ARRIVEES
 
 Intérêt :
-D’une part, il nous renseigne sur le type de clientèle (de passage, de séjour),
-d’autre part, il permet de juger la capacité de l’hôtel à retenir et à prolonger la
-durée de la présence du client. Son calcul s·effectue sur une période
-déterminée : une semaine, un mois,         
-
-
-
+il permet de juger la capacité de l’hôtel à retenir et à prolonger la
+durée de la présence du client.        
+C'est un indicateur clé pour évaluer la satisfaction des clients, la fidélité et
+l'efficacité opérationnelle de l'hôtel. 
     """)
 with left_column:
     st.write(fig2)
     with st.expander("🔑explexation"):
        st.write("""
-L’ADR (average daily rate) est le prix moyen quotidien de vos chambres
+
+ Formule :  
+L'ADR = C.A LOCATION / NBRE DE CHAMBRES LOUEES
+
+REVPAR = C.A LOCATION / NBRE DE CHAMBRES DISPONIBLE
 
 Intérêt :
-Le REVPAR (revenue per available room) représente le revenu par chambre disponible. Ceci signifie qu’une chambre en particulier peut être louée pendant la période observée. Cet indicateur métrique est calculé en multipliant l’ADR par le taux d’occupation. Il sert à déterminer le prix moyen affiché pour les chambres disponibles. Prenons un exemple sur un mois. 
-le chiffre d'affaire d'une entreprise correspond à la somme des ventes effectuées par celle-ci. Il peut être dit HT (hors taxes) ou peut inclure la TVA (Taxe sur la Valeur Ajoutée), auquel cas on parle de chiffre d'affaires TTC (toutes charges comprises).          
- 
+
+1) L'ADR Le tarif journalier moyen, ou Average Daily Rate (ADR) en anglais,
+est un indicateur de performance hôtelier important qui repose sur le calcul  du prix moyen d'une chambre louée un jour donné.  
+2) REVPAR, Revenu par chambre disponible représente l'évolution du
+revenu généré par chaque chambre disponible de l'hôtel au fil du temps. 
+
        """)
 
 
@@ -346,16 +350,15 @@ fig_taux_realisation.update_layout(
                   yaxis_title_text='Valeurs')
 
 # Affichage du graphique
-st.markdown("<h1 style=' font-size: 30px;'>🎯Taux de la realisation financiere revenue hebergement</h1>", unsafe_allow_html=True)            
+st.markdown("<h1 style=' font-size: 30px;'>🎯Taux de la realisation financiere </h1>", unsafe_allow_html=True)            
 st.write(fig_taux_realisation)
 with st.expander("🔑explexation"):
        st.write("""
 Formule :
-C.A. TOTAL REALISE EN LOCATION/C.A. POTENTIEL 
+C.A. TOTAL REALISE EN LOCATION / C.A. POTENTIEL 
 
 Intérêt:
- Il permet de connaître le manque à gagner de la sous-location et donc,
-d’engager les actions nécessaires.
+Il permet de connaître le manque à gagner de la sous-location , pour engager les actions nécessaires.
 
     """)
 
@@ -422,7 +425,7 @@ with col1:
      st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{taux_remplissage:.2%}</h1>", unsafe_allow_html=True)
      with st.expander("🔑explexation"):
        st.write("""formule:
-(Nombre de repas servis/ (nombre de place disponible*nombre de service*nombre de jours d’exploitations*100
+(Nombre de repas servis/ (nombre de place disponible * nombre de service * nombre de jours d’exploitations ) *100
 
 Intérêt :
 C’est l’équivalent du taux d’occupation en hébergement, il nous renseigne sur le
@@ -454,7 +457,7 @@ Intérêt :
 Il permet de nous indiquer le taux de rotation de la chaise
     """)
        
-st.markdown("<h1 style=' font-size: 30px;'>🎯Taux de la realisation financiere Revenue restaurations</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style=' font-size: 30px;'>🎯Taux de la realisation financiere</h1>", unsafe_allow_html=True)
 st.write(fig_taux_realisation_r)  
 with st.expander("🔑explexation"):
        st.write("""
@@ -498,10 +501,9 @@ Formule :
 (NBRE DE CHAMBRES DISPONIBLES OU DE CHAMBRES LOUEES)/(NBRE DE SALARIES)
 
 Intérêt :
-Ce ratio indique l’effectif moyen par chambre disponible ou louée. Il est calculé
-pour l’ensemble de l’établissement de l’établissement ou pour un service donné.
-Il dépend de la catégorie de l’établissement et permet des comparaisons avec les
-statistiques professionnelles
+Ce ratio indique l’effectif moyen par chambre disponible ou louée. 
+Il mesure l'efficacité de l'utilisation des ressources humaines dans un
+établissement ou un service donné. 
     """)
 
 with col2:
@@ -521,16 +523,16 @@ st.markdown("<h1 style=' font-size: 40px;color:rgb(255,69,0);'>🍴  l'activite 
 
 cout_nourriture_vendues  = df_couts_s_filtre["Nourriture"].sum()
 totale_vendue_nourriture = df_r_restauration_filtre["ventes nourriture"].sum()
-cout_nourriture =round((cout_nourriture_vendues/totale_vendue_nourriture)*100,3)
+cout_nourriture =round((cout_nourriture_vendues/totale_vendue_nourriture),3)
 
 
 cout_boisson_vendues = df_couts_s_filtre["Boisson"].sum()
 totale_vendue_boisson = df_r_restauration_filtre["ventes boissons"].sum()
-cout_boisson =round((cout_boisson_vendues/totale_vendue_boisson)*100,3)
+cout_boisson =round((cout_boisson_vendues/totale_vendue_boisson),3)
 
 cout_fb = df_couts_s_filtre["totale COUTS F&B"].sum()
 Revenue_restaurations= df_r_restauration_filtre["Revenue restaurations"].sum()
-cout_matiere =round((cout_fb/Revenue_restaurations)*100,3)
+cout_matiere =round((cout_fb/Revenue_restaurations),3)
 
 
 total_couvert_servie =df_r_restauration_filtre["Nombre de couvert servis"].sum()
@@ -544,11 +546,11 @@ efficacite_personnel = round(nb_heure_travaille_salaries_CUISINE/total_couvert_s
 col1,col2 =st.columns(2)
 with col1:
      st.markdown("<h1 style=' font-size: 30px;'>🎯Le cout nourriture(par mois)</h1>", unsafe_allow_html=True) 
-     st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{cout_nourriture}</h1>", unsafe_allow_html=True)
+     st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{cout_nourriture:.2%}</h1>", unsafe_allow_html=True)
      with st.expander("🔑explexation"):
        st.write("""
 Formule :
-Coûts nourriture vendue d’une période11/total ventes nourriture de la période
+(Coûts nourriture vendue d’une période / total ventes nourriture de la période)
 x100
 
 Intérêt :
@@ -557,15 +559,15 @@ Il permet de mesurer le coût des denrées utilisées dans la confection des pla
 
 with col2:
      st.markdown("<h1 style=' font-size: 30px;'>🎯Le cout boisson(par mois)</h1>", unsafe_allow_html=True)
-     st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{cout_boisson}</h1>", unsafe_allow_html=True)
+     st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{cout_boisson:.2%}</h1>", unsafe_allow_html=True)
      with st.expander("🔑explexation"):
        st.write("""
  Formule :
-Coûts boissons vendues d’une période/total ventes boissons de la période x100
+(Coûts boissons vendues d’une période / total ventes boissons de la période) x100
 
 Intérêt :
-Il permet de refléter l’ensemble des coûts boissons et nourritures comprise dans
-les boissons
+Le coût des boissons par mois, exprimé en pourcentage par rapport aux
+ventes.
 
     """)
        
@@ -573,17 +575,15 @@ les boissons
 col1,col2 =st.columns(2)
 with col1:
      st.markdown("<h1 style=' font-size: 30px;'>🎯Le cout matiere(par mois)</h1>", unsafe_allow_html=True) 
-     st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{cout_matiere}</h1>", unsafe_allow_html=True)
+     st.write(f"<h1 style='text-align: center; color: rgb(0, 255, 255);'>{cout_matiere:.2%}</h1>", unsafe_allow_html=True)
      with st.expander("🔑explexation"):
        st.write("""
  Formule :
 Coûts F&B d’une période/total ventes de la période x100
 
 Intérêt :
- Coût nourriture vendue=stock début de période +chats de matières premières –stock
-fin de période-repas personnel-offerts
-Il permet à l’entreprise de mieux suivre le premier de ses coûts principaux
-
+Coût nourriture vendue par mois, exprimé en pourcentage par rapport aux
+ventes.
     """)
 
 with col2:
@@ -595,7 +595,7 @@ with col2:
 Total d’heures travaillées sur une période/total de couverts sur la même période
 
 Intérêt :
-Il détermine le coût, en temps, de chaque couvert
+Il détermine le coût, en temps, de chaque couvert ,dans ce cas , avec une efficacité du personnel de 0,867, cela suggère que pour chaque couvert réalisé sur la période donnée, en moyenne 0,867 heures de travail ont été nécessaires.
     """)      
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -618,5 +618,7 @@ with col3:
     st.image(logo_iset,
         width=400,
     )
+
+
 
 
